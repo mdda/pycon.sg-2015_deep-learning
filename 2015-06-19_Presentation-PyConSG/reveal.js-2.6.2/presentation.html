@@ -68,23 +68,46 @@ Intro : Motivation
 Intro: Basic Network
   Diagram => Matrix multiply
   Training == differentiation
-  so : need more than numpy 
+    so : need more than numpy 
+  Theano as computation description 
 
 Intro: MNIST
-  Blocks of operations
-  Theano descriptions
-  Parse tree
+  More complex set of operations
+  Parse tree from Theano
+  CPU output
 
 Intro: ConvNets
   Convnet blocks
+  Size of problems
+  GPU output
+  Diagram of an ~AlexNet
+
+Intro: 'blocks' for Theano
+  Overlay on top of Theano
+    Make deeper networks simpler to describe
+  Maps to whole langauge of DNN
+    Different kinds of 
+      sigmoids
+        tanh
+        ReLU ...
+      gradient descent methods 
+        momentum
+        ADAgrad ...
+      cost functions
 
 Intro: WordEmbedding
   word2vec and gensim
+    Ought to mention since it's very competitive
 
 Intro: RecurrentNets
-  Audio in phones
-  Translation
-  
+  Applications:
+    Audio in phones
+    Translation
+  Surprising that these automata can also be trained
+    Need lots of data
+    'blocks' language can describe it all
+
+"Demo" : Examples from character-by-character
   
 
  -- possibly intersperse these tid-bits in the main flow of the talk
