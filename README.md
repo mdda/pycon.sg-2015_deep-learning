@@ -1,3 +1,3 @@
-# pycon.sg-2015-deep-learning
-Materials for PyCon (SG) 2015 Presentation : "Machine Learning : Going Deeper with Python and Theano"
+# Machine Learning : Going Deeper with Python and Theano
 
+This repo contains the materials for my presentation to PyCon (SG), on 19 June 2015.
