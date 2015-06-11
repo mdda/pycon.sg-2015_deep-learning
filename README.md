@@ -11,19 +11,35 @@ installed/compiled by ```pip``` (which will willingly install without
 ```OpenBLAS```, for instance) : 
 
 ```
-dnf install scipy numpy Cython
-``` 
+dnf install scipy numpy python-pandas Cython 
+```
 
-Then, as usual :
+(and, since it's so handy):
 
 ```
-virtualenv env
+dnf install python-ipython-notebook
+```
+
+
+Then, as usual (but making use of these system-site-packages) :
+
+```
+virtualenv --system-site-packages env
 . env/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt 
-# Wait...
+
+# Wait 10mins (107Mb of stuff in env/lib/python2.7/site-packages/)
 ```
 
+## Running the Presentation
+
+```
+. env/bin/activate
+ipython notebook ipynb/Deep-Learning-with-Blocks-and-Theano.ipynb 
+# Then open a browser at : http://localhost:8888/
+# or, more specifically : http://localhost:8888/notebooks/Deep-Learning-with-Blocks-and-Theano.ipynb
+```
 
 ### Git Repo friendly iPython Notebooks
 
