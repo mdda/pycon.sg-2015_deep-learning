@@ -41,6 +41,10 @@ ipython notebook ipynb/Deep-Learning-with-Blocks-and-Theano.ipynb
 # or, more specifically : http://localhost:8888/notebooks/Deep-Learning-with-Blocks-and-Theano.ipynb
 ```
 
+* ```wget https://raw.githubusercontent.com/mila-udem/blocks/master/docs/tutorial.rst```
+* ```pandoc --mathjax --from=rst --to=markdown_mmd tutorial.rst > tutorial.md```
+
+
 ### Git Repo friendly iPython Notebooks
 
 Using the code from https://github.com/toobaz/ipynb_output_filter (which 
