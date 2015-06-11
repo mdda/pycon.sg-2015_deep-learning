@@ -1,2 +1,5 @@
-.geany/
 *.pyc
+ipynb/.ipynb_checkpoints
+
+.geany/
+

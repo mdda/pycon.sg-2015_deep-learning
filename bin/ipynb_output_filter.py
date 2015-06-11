@@ -4,7 +4,7 @@ import sys
 
 version = None
 
-print "HELLO OUTPUT_FILTER"
+#print "HELLO OUTPUT_FILTER"
 
 if sys.version[0] == '2':
     reload(sys)
