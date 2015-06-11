@@ -5,8 +5,10 @@ This repo contains the materials for my presentation to PyCon (SG), on 19 June 2
 
 ### Git Repo friendly iPython Notebooks
 
-Using the code from https://github.com/toobaz/ipynb_output_filter, you can
-enable the feature just on one repository, rather than installing it globally, as follows...
+Using the code from https://github.com/toobaz/ipynb_output_filter (which 
+was referenced from http://stackoverflow.com/questions/18734739/using-ipython-notebooks-under-version-control), 
+you can enable the feature just on one repository, 
+rather than installing it globally, as follows...
 
 Within the repository, run : 
 ```
