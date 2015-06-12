@@ -67,4 +67,10 @@ Note also that there's a ``<REPO>/.gitattributes`` file here containing the foll
 * ```wget https://raw.githubusercontent.com/mila-udem/blocks/master/docs/tutorial.rst```
 * ```pandoc --mathjax --from=rst --to=markdown_mmd tutorial.rst > tutorial.md```
 
+Also useful :
+
+* [MathJax](http://nbviewer.ipython.org/github/olgabot/ipython/blob/master/examples/Notebook/Typesetting%20Math%20Using%20MathJax.ipynb)
+* [Bokeh](http://bokeh.pydata.org/en/latest/docs/quickstart.html)
+
+
 
