@@ -45,6 +45,14 @@ ipython notebook ipynb/Deep-Learning-with-Blocks-and-Theano.ipynb
 
 ```
 
+To run the live-plotting example, you'll also need to start the 
+``bokeh-server`` in another process :
+
+```
+. env/bin/activate
+bohek-server
+```
+
 
 ### Notes : Git-friendly iPython Notebooks
 
