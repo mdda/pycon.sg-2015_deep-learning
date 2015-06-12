@@ -39,6 +39,10 @@ pip install -r requirements.txt
 ipython notebook ipynb/Deep-Learning-with-Blocks-and-Theano.ipynb 
 # Then open a browser at : http://localhost:8888/
 # or, more specifically : http://localhost:8888/notebooks/Deep-Learning-with-Blocks-and-Theano.ipynb
+
+## Another suggestion (--browser prevents the distracting launch of an browser window)
+#ipython notebook --matplotlib inline --port=8888 --browser=false
+
 ```
 
 
@@ -63,6 +67,9 @@ Note also that there's a ``<REPO>/.gitattributes`` file here containing the foll
 ```
 
 ### Notes : Building the Presentation
+
+For 'Deep-Learning-with-Blocks-and-Theano.ipynb' I used the tutorial 
+from the ``blocks`` documentation as a starter :
 
 * ```wget https://raw.githubusercontent.com/mila-udem/blocks/master/docs/tutorial.rst```
 * ```pandoc --mathjax --from=rst --to=markdown_mmd tutorial.rst > tutorial.md```
