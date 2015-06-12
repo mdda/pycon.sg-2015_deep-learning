@@ -1,6 +1,8 @@
 *.pyc
 ipynb/.ipynb_checkpoints
+
 notes.txt
+ipynb/tutorial.*
 
 .geany/
 
