@@ -48,7 +48,7 @@ else:
 for sheet in sheets:
     for cell in sheet.cells:
         if "outputs" in cell:
-            cell.outputs = []
+            cell["outputs"] = []
             if debug:
                 debug.write("deleted an output in 'sheets.sheet.cells.outputs'\n")
         for field in ("prompt_number", "execution_number"):
