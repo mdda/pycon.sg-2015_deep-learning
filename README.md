@@ -60,8 +60,10 @@ bohek-server
 ipython notebook --ip=0.0.0.0 --port=8888 --browser=none &
 bokeh-server --ip=0.0.0.0 --port=8889
 ```
+The iPython notebook call to ``bokeh.io.output_notebook()`` appears 
+to find the correct port for the ``bokeh-server`` automagically.
 
-Remember to adjust the firewall...
+Remember to adjust the firewall to allow these two open ports...
 
 
 
