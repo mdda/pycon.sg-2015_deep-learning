@@ -37,12 +37,12 @@ pip install -r requirements.txt
 ```
 . env/bin/activate
 ipython notebook ipynb/Deep-Learning-with-Blocks-and-Theano.ipynb 
+
 # Then open a browser at : http://localhost:8888/
 # or, more specifically  : http://localhost:8888/notebooks/Deep-Learning-with-Blocks-and-Theano.ipynb
 
 ## Another suggestion (--browser prevents the distracting launch of an browser window)
-#ipython notebook --matplotlib inline --port=8888 --browser=none
-
+ipython notebook --port=8888 --browser=none
 ```
 
 To run the live-plotting example, you'll also need to start the 
@@ -52,6 +52,17 @@ To run the live-plotting example, you'll also need to start the
 . env/bin/activate
 bohek-server
 ```
+
+### Running the Presentation (across a network)
+
+```
+. env/bin/activate
+ipython notebook --ip=0.0.0.0 --port=8888 --browser=none &
+bokeh-server --ip=0.0.0.0 --port=8889
+```
+
+Remember to adjust the firewall...
+
 
 
 ### Notes : Git-friendly iPython Notebooks
