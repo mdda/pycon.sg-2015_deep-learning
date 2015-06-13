@@ -62,7 +62,7 @@ for sheet in sheets:
 if 'signature' in json_in.metadata:
     json_in.metadata['signature'] = ""
 
-result = write(json_in, sys.stdout, version)
+write(json_in, sys.stdout, version)
 
 if debug:
     write(json_in, debug, version)
@@ -72,4 +72,4 @@ if debug:
 if debug:
   debug.close()
 
-exit(result)
+exit(0)
