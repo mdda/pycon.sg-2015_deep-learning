@@ -69,26 +69,26 @@ Remember to adjust the firewall to allow these two open ports...
 
 ### Notes : Git-friendly iPython Notebooks
 
-Using the code from https://github.com/toobaz/ipynb_output_filter (which 
-was referenced from http://stackoverflow.com/questions/18734739/using-ipython-notebooks-under-version-control), 
+Using the code from : http://pascalbugnion.net/blog/ipython-notebooks-and-git.html (and
+https://gist.github.com/pbugnion/ea2797393033b54674af ), 
 you can enable the feature just on one repository, 
 rather than installing it globally, as follows...
 
-Perhaps preferred : http://pascalbugnion.net/blog/ipython-notebooks-and-git.html (and
-https://gist.github.com/pbugnion/ea2797393033b54674af )...
-
 Within the repository, run : 
 ```
+# Set the permissions for execution :
+chmod 754 ./bin/ipynb_optional_output_filter.py
+
 git config filter.dropoutput_ipynb.smudge cat
-git config filter.dropoutput_ipynb.clean "python $(git rev-parse --show-toplevel)/bin/ipynb_output_filter.py"
+git config filter.dropoutput_ipynb.clean ./bin/ipynb_optional_output_filter.py"
 ```
 this will add suitable entries to ``./.git/config``.
 
-or, alternatively, do it manually by ensuring that your ``.git/config`` includes the lines :
+or, alternatively, create the entries manually by ensuring that your ``.git/config`` includes the lines :
 ```
 [filter "dropoutput_ipynb"]
 	smudge = cat
-	clean = python REPO/bin/ipynb_output_filter.py
+	clean = ./bin/ipynb_output_filter.py
 ```
 (where ``REPO`` is the absolute path to the root of the checked out repository).
 
