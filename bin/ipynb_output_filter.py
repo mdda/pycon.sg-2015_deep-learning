@@ -5,7 +5,7 @@ import sys
 version = None
 
 debug=None
-debug=open('log-ipynb-filter','w')
+debug=open('log-ipynb-filter','w+')
 
 if debug:
     debug.write("Filterering\n")
