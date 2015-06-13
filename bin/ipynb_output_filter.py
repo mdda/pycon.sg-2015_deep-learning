@@ -47,10 +47,11 @@ else:
 
 for sheet in sheets:
     for cell in sheet.cells:
-        if "outputs" in cell:
-            cell["outputs"] = []
-            if debug:
-                debug.write("deleted an output in 'sheets.sheet.cells.outputs'\n")
+        for field in ("outputs"):
+            if field in cell:
+              if debug:
+                  debug.write("deleting 'sheets.sheet.cells.%s' : %s\n" % (field, cell[field]) )
+              cell[field] = []
         for field in ("prompt_number", "execution_number"):
             if field in cell:
                 del cell[field]
@@ -64,6 +65,7 @@ if 'signature' in json_in.metadata:
 write(json_in, sys.stdout, version)
 
 if debug:
+    debug.write(json_in)
     debug.write("Finished\n")
 
 if debug:
