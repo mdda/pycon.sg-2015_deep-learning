@@ -47,15 +47,15 @@ else:
 
 for sheet in sheets:
     for cell in sheet.cells:
-        for field in ("outputs"):
+        for field in ("outputs", ):
             if field in cell:
-              if debug:
-                  debug.write("deleting 'sheets.sheet.cells.%s' : %s\n" % (field, cell[field]) )
-              cell[field] = []
-        for field in ("prompt_number", "execution_number"):
+                if debug:
+                    debug.write("deleting 'sheets.sheet.cells.%s' : %s\n" % (field, cell[field]) )
+                cell[field] = []
+        for field in ("prompt_number", "execution_number", ):
             if field in cell:
                 del cell[field]
-        for field in ("execution_count",):
+        for field in ("execution_count", ):
             if field in cell:
                 cell[field] = None
 
