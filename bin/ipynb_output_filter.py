@@ -65,7 +65,7 @@ if 'signature' in json_in.metadata:
 write(json_in, sys.stdout, version)
 
 if debug:
-    debug.write(json_in)
+    debug.write("json-result :\n%s" % (json_in))
     debug.write("Finished\n")
 
 if debug:
