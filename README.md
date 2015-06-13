@@ -77,10 +77,18 @@ rather than installing it globally, as follows...
 Within the repository, run : 
 ```
 git config filter.dropoutput_ipynb.smudge cat
-git config filter.dropoutput_ipynb.clean 'python bin/ipynb_output_filter.py'
+git config filter.dropoutput_ipynb.clean "python $(git rev-parse --show-toplevel)/bin/ipynb_output_filter.py"
 ```
+this will add suitable entries to ``./.git/config``.
 
-This will add suitable entries to ``./.git/config``.
+or, alternatively, do it manually by ensuring that your ``.git/config`` includes the lines :
+```
+[filter "dropoutput_ipynb"]
+	smudge = cat
+	clean = python REPO/bin/ipynb_output_filter.py
+```
+(where ``REPO`` is the absolute path to the REPO root).
+
 
 Note also that there's a ``<REPO>/.gitattributes`` file here containing the following:
 ```
