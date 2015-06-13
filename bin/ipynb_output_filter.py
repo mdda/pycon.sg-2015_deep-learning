@@ -4,7 +4,8 @@ import sys
 
 version = None
 
-#print "HELLO OUTPUT_FILTER"
+debug=None
+debug=open('log-ipynb-filter','w')
 
 if sys.version[0] == '2':
     reload(sys)
@@ -29,6 +30,9 @@ if not version:
     json_in = json.loads(to_parse)
     version = json_in['nbformat']
 
+if debug:
+    debug.write("nbformat=%s\n" % (version))
+    
 json_in = reads(to_parse, version)
 
 if hasattr(json_in, 'worksheets'):
@@ -42,6 +46,8 @@ for sheet in sheets:
     for cell in sheet.cells:
         if "outputs" in cell:
             cell.outputs = []
+            if debug:
+                debug.write("deleted an output\n")
         for field in ("prompt_number", "execution_number"):
             if field in cell:
                 del cell[field]
@@ -53,3 +59,6 @@ if 'signature' in json_in.metadata:
     json_in.metadata['signature'] = ""
 
 write(json_in, sys.stdout, version)
+
+if debug:
+  debug.close()
