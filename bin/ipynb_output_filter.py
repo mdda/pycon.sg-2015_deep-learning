@@ -1,4 +1,4 @@
-#! /usr/bin/python
+# Runs using command-line python (which should inherit ./env)
 
 import sys
 
@@ -6,6 +6,9 @@ version = None
 
 debug=None
 debug=open('log-ipynb-filter','w')
+
+if debug:
+    debug.write("Filterering\n")
 
 if sys.version[0] == '2':
     reload(sys)
@@ -47,7 +50,7 @@ for sheet in sheets:
         if "outputs" in cell:
             cell.outputs = []
             if debug:
-                debug.write("deleted an output\n")
+                debug.write("deleted an output in 'sheets.sheet.cells.outputs'\n")
         for field in ("prompt_number", "execution_number"):
             if field in cell:
                 del cell[field]
@@ -59,6 +62,9 @@ if 'signature' in json_in.metadata:
     json_in.metadata['signature'] = ""
 
 write(json_in, sys.stdout, version)
+
+if debug:
+    debug.write("Finished\n")
 
 if debug:
   debug.close()
