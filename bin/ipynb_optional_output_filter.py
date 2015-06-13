@@ -1,3 +1,4 @@
+#!/usr/bin/env python
  
 """
 Suppress output and prompt numbers in git version control.

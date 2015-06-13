@@ -74,7 +74,8 @@ was referenced from http://stackoverflow.com/questions/18734739/using-ipython-no
 you can enable the feature just on one repository, 
 rather than installing it globally, as follows...
 
-Perhaps preferred : http://pascalbugnion.net/blog/ipython-notebooks-and-git.html 
+Perhaps preferred : http://pascalbugnion.net/blog/ipython-notebooks-and-git.html (and
+https://gist.github.com/pbugnion/ea2797393033b54674af )...
 
 Within the repository, run : 
 ```
