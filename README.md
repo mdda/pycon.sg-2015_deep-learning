@@ -98,6 +98,13 @@ Note also that there's a ``<REPO>/.gitattributes`` file here containing the foll
 *.ipynb    filter=dropoutput_ipynb
 ```
 
+To include this feature in a notebook, simply add to its 
+metadata (Edit-Metadata) as a first-level entry: 
+
+```
+  "git" : { "suppress_outputs" : true },
+```
+
 ### Notes : Building the Presentation
 
 For 'blocks-introduction-mnist.ipynb' I used the tutorial 
