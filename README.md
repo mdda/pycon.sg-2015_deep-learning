@@ -71,7 +71,7 @@ Remember to adjust the firewall to allow these two open ports...
 
 Using the code from : http://pascalbugnion.net/blog/ipython-notebooks-and-git.html (and
 https://gist.github.com/pbugnion/ea2797393033b54674af ), 
-you can enable the feature just on one repository, 
+you can enable this kind of feature just on one repository, 
 rather than installing it globally, as follows...
 
 Within the repository, run : 
@@ -98,11 +98,20 @@ Note also that there's a ``<REPO>/.gitattributes`` file here containing the foll
 *.ipynb    filter=dropoutput_ipynb
 ```
 
-To include this feature in a notebook, simply add to its 
-metadata (Edit-Metadata) as a first-level entry: 
+There are two different approaches to doing the cleansing in the ``REPO/bin`` directory : 
+
+* ``ipynb_output_filter.py`` : which is probably more comprehensive, since it uses iPython itself
+  to parse and output the notebooks - but care must be taken to ensure that it is run within the current ``env``
+  
+* ``ipynb_optional_output_filter.py`` : This is my current chosen approach, which only uses
+  ``import json`` to parse the notebook files (and so can be executed as a plain script).  It 
+  also includes the ``git:suppress_outputs=false`` option that might be useful...
+
+To include disable the output-cleansing feature in a notebook in the latter case, 
+simply add to its metadata (Edit-Metadata) as a first-level entry (``true`` is the default): 
 
 ```
-  "git" : { "suppress_outputs" : true },
+  "git" : { "suppress_outputs" : false },
 ```
 
 ### Notes : Building the Presentation

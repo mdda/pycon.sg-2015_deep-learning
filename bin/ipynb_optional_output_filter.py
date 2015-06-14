@@ -4,11 +4,12 @@
 Suppress output and prompt numbers in git version control.
 
 This script will tell git to ignore prompt numbers and cell output
-when looking at ipynb files if their metadata contains:
+when looking at ipynb files if their metadata does not contain:
 
-    "git" : { "suppress_output" : true }
+    "git" : { "suppress_output" : false }
 
-The notebooks themselves are not changed.
+The notebooks themselves are not changed in the REPO (i.e. this filter
+only changes their effective appearance to git itself).
 
 See also this blogpost: http://pascalbugnion.net/blog/ipython-notebooks-and-git.html.
 
@@ -64,10 +65,10 @@ nb = sys.stdin.read()
  
 json_in = json.loads(nb)
 nb_metadata = json_in["metadata"]
-suppress_output = False
+suppress_output = True
 if "git" in nb_metadata:
-    if "suppress_outputs" in nb_metadata["git"] and nb_metadata["git"]["suppress_outputs"]:
-        suppress_output = True
+    if "suppress_outputs" in nb_metadata["git"]:
+        suppress_output = nb_metadata["git"]["suppress_outputs"]
 if not suppress_output:
     sys.stdout.write(nb)
     exit() 
