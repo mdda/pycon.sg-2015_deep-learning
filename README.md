@@ -80,7 +80,7 @@ Within the repository, run :
 chmod 754 ./bin/ipynb_optional_output_filter.py
 
 git config filter.dropoutput_ipynb.smudge cat
-git config filter.dropoutput_ipynb.clean ./bin/ipynb_optional_output_filter.py"
+git config filter.dropoutput_ipynb.clean ./bin/ipynb_optional_output_filter.py
 ```
 this will add suitable entries to ``./.git/config``.
 
