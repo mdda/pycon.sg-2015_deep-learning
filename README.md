@@ -50,7 +50,7 @@ To run the live-plotting example, you'll also need to start the
 
 ```
 . env/bin/activate
-bohek-server
+bokeh-server
 ```
 
 ### Running the Presentation (across a network)
