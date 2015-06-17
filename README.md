@@ -67,12 +67,20 @@ Remember to adjust the firewall to allow these two open ports...
 
 ### GPU-aware iPython
 
-This will make use of an Nvidia card in a notebook (where ``COMMAND-LINE`` is 
-the ``ipython`` command that one would ordinarily run ::
+#### Laptop 
+
+Making use of an Nvidia card in a notebook (where ``COMMAND-LINE`` is 
+the ``python`` command that one would ordinarily run) is usually as follows ::
 
 ```
 THEANORC=theano.cuda-gpuarray.rc optirun {COMMAND-LINE}
 ```
+
+However, because IPython spawns sub-processes to handle each kernel/notebook,
+the ``optirun`` invocation isn't made for the child processes that should actually
+perform the work on the GPU.  
+
+So far, the only route to making this work has been to replace
 
 
 

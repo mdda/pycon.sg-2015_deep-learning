@@ -1,9 +1,9 @@
 [global]
 floatX=float32
 warn_float64=warn 
-force_device=True
 
 device=cuda0
+force_device=True
 
 exception_verbosity=high
 optimizer=fast_compile
