@@ -17,7 +17,7 @@ dnf install scipy numpy python-pandas Cython
 (and, since it's so handy):
 
 ```
-dnf install python-ipython-notebook
+dnf install python-ipython-notebook pydot
 ```
 
 
@@ -64,6 +64,15 @@ The iPython notebook call to ``bokeh.io.output_notebook()`` appears
 to find the correct port for the ``bokeh-server`` automagically.
 
 Remember to adjust the firewall to allow these two open ports...
+
+### GPU-aware iPython
+
+This will make use of an Nvidia card in a notebook (where ``COMMAND-LINE`` is 
+the ``ipython`` command that one would ordinarily run ::
+
+```
+THEANORC=theano.cuda-gpuarray.rc optirun {COMMAND-LINE}
+```
 
 
 

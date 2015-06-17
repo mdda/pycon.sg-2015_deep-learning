@@ -1,0 +1,14 @@
+[global]
+floatX=float32
+warn_float64=warn 
+force_device=True
+
+device=cuda0
+
+exception_verbosity=high
+optimizer=fast_compile
+
+#mode=FAST_RUN
+mode=DebugMode
+nocleanup=True
+

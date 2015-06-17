@@ -16,10 +16,18 @@ git+https://github.com/mila-udem/fuel#egg=fuel
 --allow-unverified blocks-extras
 git+git://github.com/mila-udem/blocks-extras.git
 
+# Plotting of graphs
 bokeh>=0.9.0
-ipython>=3.1.0
-
 jsonschema
 
+# iPython Notebook 
+ipython>=3.1.0
+
+# Visualization of theano graphs
+pydot 
+
+## This is for Python word2vec
 #gensim
+
+## This is a hd5 pickler (fast)
 #hickle
