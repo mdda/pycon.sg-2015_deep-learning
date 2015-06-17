@@ -80,7 +80,11 @@ However, because IPython spawns sub-processes to handle each kernel/notebook,
 the ``optirun`` invocation isn't made for the child processes that should actually
 perform the work on the GPU.  
 
-So far, the only route to making this work has been to replace
+So far, the only route to making this work has been to replace the 
+``env/bin/python2`` with a script that runs ``optirun python2-bin`` where 
+``python2-bin`` is a copy of the previously existing ``python2``.  But doing this
+the causes all python (in that ``virtualenv``) to switch the GPU on, which 
+wasn't really the plan.
 
 
 
