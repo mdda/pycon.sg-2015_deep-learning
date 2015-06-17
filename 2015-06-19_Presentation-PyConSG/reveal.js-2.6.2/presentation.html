@@ -6,7 +6,7 @@
 
   <title>Theano for the Billion Word Kaggle</title>
 
-  <meta name="description" content="Presentation on Theano for the PySG MeetUp">
+  <meta name="description" content="Presentation on Theano for PyCon.SG 2015">
   <meta name="author" content="Martin Andrews">
 
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -58,20 +58,77 @@ table.table-fix {
 </style>
 
 <!--
-## Target : 10-20 mins
+## Target : 35-45 mins
+
+Intro : Me
 
 Intro : Motivation
+  History of the field
+  Why it's exciting now
+  Who's involved
 
-Explain Kaggle competition
-  Test set
-    100k sentences each with 1 word missing
-    Levenshtein distance (character errors)
-  Training set
-    1Bn word Corpus 
-  "State of Play"
-    End date
-    Lack of entries
+Intro: Basic Network
+  Diagram => Matrix multiply
+  Training == differentiation
+    so : need more than numpy 
+  Theano as computation description 
 
+Intro: MNIST
+  More complex set of operations
+  Parse tree from Theano
+  CPU output
+
+Intro: ConvNets
+  Convnet blocks
+  Size of problems
+  GPU output
+  Diagram of an ~AlexNet
+
+Intro: 'blocks' for Theano
+  Overlay on top of Theano
+    Make deeper networks simpler to describe
+  Maps to whole langauge of DNN
+    Different kinds of 
+      initializations
+        constants
+        gaussians 
+        orthonormals
+      sigmoids
+        tanh
+        ReLU ...
+      gradient descent methods 
+        momentum
+        ADAgrad ...
+      cost functions
+
+Intro: WordEmbedding
+  word2vec and gensim
+    Ought to mention since it's very competitive
+
+Intro: RecurrentNets
+  Applications:
+    Audio in phones
+    Translation
+  Surprising that these automata can also be trained
+    Need lots of data
+    'blocks' language can describe it all
+
+"Demo" : Examples from character-by-character
+  10
+  100
+  1000
+  
+  
+What is in the REPO
+  Notes on installing blocks "bleeding edge"
+    NB : Fairly large downloads...
+  iPython
+    graphing
+    character-by-character
+  Please star
+
+ 
+ 
 Explain Approach
   WordEmbedding
     How this is exciting
@@ -107,104 +164,57 @@ End
 !-->
 
 <section>
- <h1>1Bn Word NLP</h1>
- <h3>with Theano</h3>
+ <h1>Going Deeper</h1>
+ <h3>with Python & Theano</h3>
  <p>
   <small><a href="http://mdda.net">Martin Andrews</a> / <a href="http://twitter.com/redcatlabs">@redcatlabs</a></small>
  </p>
  <p>
-  <small>15 January 2015</small>
+  <small>19 June 2015</small>
  </p>
 </section>
 
 
 
 <section>
-  <section>
-   <h2>Background</h2>
-   <ul class="fix-spacing">
-    <li>Finance / Startups / Machine Learning</li>
-    <li>Moved to Singapore in Sep-2013</li>
-    <li>The past year (2014) = 'fun' :</li>
-    <li style="list-style-type:none">
-      <ul>
-        <li>Machine Learning : Deep Learning, NLP</li>
-        <li>Languages : Python, Go, Scala, NodeJS, Haskell, Python</li>
-        <li>"MeetUp Pro" / Kaggle Novice</li>
-      </ul>
-    </li>
-   </ul>
-  </section>
-  <section>
-   <h2>Motivation...</h2>
-   <ul class="fix-spacing">
-    <li>Goals :</li>
-    <li style="list-style-type:none">
-      <ul>
-        <li>Do some real-world-scale NLP</li>
-        <li>Use Theano</li>
-        <li>Improve Theano (OpenCL)</li>
-      </ul>
-    </li>
-    <li>Magic Solution : Kaggle Competition</li>
-   </ul>
-  </section>
+ <h2>About Me</h2>
+ <ul class="fix-spacing">
+  <li>Finance / Startups / Machine Learning</li>
+  <li style="list-style-type:none">
+    <ul>
+      <li>Moved to Singapore in Sep-2013</li>
+    </ul>
+  </li>
+  <li>The past year (2014) = 'fun' :</li>
+  <li style="list-style-type:none">
+    <ul>
+      <li>Machine Learning : Deep Learning, NLP</li>
+      <li>Languages : Python, Go, Scala, NodeJS, Haskell, Python</li>
+      <li>"MeetUp Pro"</li>
+    </ul>
+  </li>
+  <li>This year (2015) = 'serious' NLP</li>
+ </ul>
 </section>
+
+
 
 <section>
   <section>
-   <h2>1Bn Word Imputation</h2>
-   <h3>Kaggle Competition</h3>
-   <a href="http://www.kaggle.com/c/billion-word-imputation" target=_blank>
-     <img width="800" height="284" src="img/KaggleScreenshot_800x284.png" alt="Kaggle Screenshot">
-   </a>
-  </section>
-  <section>
-   <h2>Test Set</h2>
+   <h2>Deep Learning</h2>
+   <h3>History</h3>
    <ul class="fix-spacing">
-    <li>~300k sentences, each with 1 word missing</li>
-    <li style="list-style-type:none">
-      <ul>
-        <li>Want : Each sentence filled-in correctly</li>
-      </ul>
-    </li>
-    <li>Scoring : </li>
-    <li style="list-style-type:none">
-      <ul>
-        <li>Levenshtein distance = character-based errors</li>
-        <li>This is a <i>linguistically odd</i> objective function</li>
-      </ul>
-    </li>
+    <li>1980+ : Lots of enthusiasm</li>
+    <li>1995+ : Disillusionment</li>
+    <li>2005+ : Stepwise improvement</li>
+    <li>2010+ : GPU revolution</li>
    </ul>
   </section>
   <section>
-   <h2>Training Set</h2>
-   <ul class="fix-spacing">
-    <li>"1 billion" word corpus :</li>
-    <li style="list-style-type:none">
-      <ul>
-        <li>769 million words = 4.1Gb of data</li>
-        <li>30 million sentences in English</li>
-        <li>Drawn from many different sources</li>
-      </ul>
-    </li>
-    <li>Only knowledge derived from this data is allowed</li>
-   </ul>
+   <h2>Why It's Exciting Now</h2>
   </section>
   <section>
-   <h2>Kaggle Status</h2>
-   <ul class="fix-spacing">
-    <li>Competition ends in May-2015</li>
-    <li>But activity has mostly died down : </li>
-    <li style="list-style-type:none">
-      <ul>
-        <li>Impressive groups with CPU clusters</li>
-        <li>Data size is also a hurdle</li>
-        <li>Only for fun : No 'points'</li>
-      </ul>
-    </li>
-    <li>Will release 'Getting Started' Code for laptop</li>
-   </ul>
+   <h2>Who is involved</h2>
   </section>
 </section>
 
