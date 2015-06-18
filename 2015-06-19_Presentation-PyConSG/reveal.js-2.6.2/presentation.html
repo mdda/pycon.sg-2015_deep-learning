@@ -4,7 +4,7 @@
  <head>
   <meta charset="utf-8">
 
-  <title>Theano for the Billion Word Kaggle</title>
+  <title>Going Deeper with Python & Theano</title>
 
   <meta name="description" content="Presentation on Theano for PyCon.SG 2015">
   <meta name="author" content="Martin Andrews">
@@ -83,6 +83,7 @@ Intro: ConvNets
   Size of problems
   GPU output
   Diagram of an ~AlexNet
+
 
 Intro: 'blocks' for Theano
   Overlay on top of Theano
@@ -242,22 +243,134 @@ End
   </section>
 </section>
 
+
 <section>
+  <section>
+   <h2>Basic Approach</h2>
+   <ul class="fix-spacing">
+    <li>Same as original Neural Networks in 1980s/1990s</li>
+    <li>Simple mathematical units ...</li>
+    <li style="list-style-type:none"> ... combine to compute a complex function</li>
+    <li>Focus on Supervised Learning here</li>
+   </ul>
+  </section>
+
+  <section>
+   <h2>Single "Neuron"</h2>
+   <img width="602" height="381" src="img/one-neuron_602x381.png" alt="One Neuron" style="border:none;box-shadow:none">
+   <p>Change weights to change output function</p>
+  </section>
+
+  <section>
+   <h2>Multi-Layer</h2>
+   <p>Layers of neurons combine and <br/>can form more complex functions</p>
+   <img width="356" height="324" src="img/multi-layer_356x324.png" alt="Multi-Layer" style="border:none;box-shadow:none">
+  </section>
+
+  <section>
+   <h2>Supervised Learning</h2>
+   <ul class="fix-spacing">
+    <li><strong>while</strong> not done :</li>
+    <li style="list-style-type:none">
+      <ul>
+        <li>Pick a training case (<code>x</code> &rarr; <code>target_y</code>)</li>
+        <li>Evaluate <code>output_y</code> from the <code>x</code></li>
+        <li>Modify the weights so that <code>output_y</code> is closer to <code>target_y</code> for that <code>x</code></li>
+      </ul>
+    </li>
+   </ul>
+  </section>
+
+  <section>
+   <h2>Gradient Descent</h2>
+   <p>Follow the gradient of the error <br />w.r.t the connection weights</p>
+   <img width="364" height="306" src="img/gradient-descent_364x306.png" alt="Gradient-Descent" style="border:none;box-shadow:none">
+  </section>
+</section>
+
+
+<section>
+  <section>
+   <h2>"Hello World" &rarr; MNIST</h2>
+   <ul class="fix-spacing">
+    <li>Nice dataset from the late 1990s</li>
+    <li>Training set of 50,000 28x28 images</li>
+    <li>Now end-of-life as a useful benchmark</li>
+   </ul>
+   <br />
+   <img width="255" height="204" src="img/mnist_100_digits_255x204.png" alt="MNIST digits" style="border:none;box-shadow:none">
+  </section>
+
+  <section>
+   <h2>Simple Network</h2>
+   <img width="829" height="425" src="img/netvis-mnist-100S_829x425.png" alt="Multi-Layer" style="border:none;box-shadow:none">
+   <p><i>... around 2-3% error rate on the test set</i></p>
+  </section>
+  
+  <section>
+   <h2>"LeNet"</h2>
+   <img width="759" height="209" src="img/lenet5_759x209.png" alt="LeNet5 Convolutional Layers" style="border:none;box-shadow:none">
+   <p><i>... around 0.8% error rate on the test set</i></p>
+  </section>
+</section>
+
+<section>
+  <section>
+   <h2>New Problems</h2>
+   <ul class="fix-spacing">
+    <li>ImageNet Competition</li>
+    <li>over 15 million labeled high-resolution images...</li>
+    <li style="list-style-type:none"> ... in over 22,000 categories</li>
+   </ul>
+   <br />
+   <img width="850" height="314" src="img/ilsvrc1_850x314.png" alt="ImageNet Karpathy" style="border:none;box-shadow:none">
+  </section>
+
+  <section>
+   <h2>Need for Speed</h2>
+   <img width="759" height="408" src="img/CPU-GPU_759x408.png" alt="CPU vs GPU" style="border:none;box-shadow:none">
+   <p><i>... need for GPU programmers</i></p>
+  </section>
+</section>
+
+
+<section>
+  <section>
+   <h2>Python</h2>
+   <ul class="fix-spacing">
+    <li>High level glue-code</li>
+    <li>Great Tooling</li>
+    <li style="list-style-type:none">
+      <ul>
+        <li>iPython</li>
+        <li>bokeh (visualisation)</li>
+        <li>Theano</li>
+        <li>blocks + fuel</li>
+      </ul>
+    </li>
+   </ul>
+  </section>
+  
   <section>
    <h2>Theano</h2>
    <ul class="fix-spacing">
     <li>Optimised Numerical Computation in Python</li>
-    <li>Works in conjunction with <code>numpy</code></li>
     <li>Computation is <em>described</em> in Python code :</li>
     <li style="list-style-type:none">
       <ul>
         <li>Theano operates on expression tree itself</li>
         <li>Optimizes the tree for operations it knows</li>
-        <li>Implements it in <code>C/C++</code> or <code>CUDA</code> (or <code>OpenCL</code>)</li>
+        <li>Makes use of <code>numpy</code> and <code>BLAS</code></li>
+        <li>Also writes <code>C/C++</code> or <code>CUDA</code> (or <code>OpenCL</code>)</li>
       </ul>
     </li>
    </ul>
   </section>
+  
+  <section>
+   <h2>Graphing Demo</h2>
+  </section>
+  
   <section>
    <h2>Theano : Basic</h2>
    <p>Function 'built up', then evaluated</p>
@@ -294,6 +407,15 @@ train = theano.function(
 for i in xrange(training_steps):
     pred, err = train(data_X, data_y)   
    </code></pre>
+  </section>
+</section>
+
+
+<section>
+  <section>
+   <h2>More Complex Networks</h2>
+   <img width="698" height="217" src="img/google-imagenet_698x217.png" alt="Google ImageNet" style="border:none;box-shadow:none">
+   <p><i>... now human competitive on ImageNet</i></p>
   </section>
 </section>
 
