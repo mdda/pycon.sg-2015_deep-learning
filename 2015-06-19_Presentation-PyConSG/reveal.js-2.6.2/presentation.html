@@ -415,14 +415,31 @@ for i in xrange(training_steps):
 <section>
   <section>
    <h2>More Complex Networks</h2>
-   <img width="698" height="217" src="img/google-imagenet_698x217.png" alt="Google ImageNet" style="border:none;box-shadow:none">
-   <p><i>(now human competitive on ImageNet)</i></p>
+   <ximg width="698" height="217" src="img/google-imagenet_698x217.png" alt="Google ImageNet" style="border:none;box-shadow:none">
+   <img width="614" height="286" src="img/googlenet-arch_1228x573.jpg" alt="Google ImageNet" style="border:none;box-shadow:none">
+   <p><i>GoogLeNet (2014)</i></p>
   </section>
   
   <section>
    <h2>'blocks' for Theano</h2>
    <ul class="fix-spacing">
     <li>Overlay on top of Theano</li>
+    <li>Developed by Montreal research group :</li>
+    <li style="list-style-type:none">
+      <ul>
+        <li>Recently (2015-06) launched</li>
+        <li>Being actively developed</li>
+        <li>Documentation actually exists</li>
+        <li>Happy to accept Pull Requests</li>
+        <li>Active on Google Groups</li>
+      </ul>
+    </li>
+   </ul>
+  </section>
+  
+  <section>
+   <h2>'blocks' Teaser</h2>
+   <ul class="fix-spacing">
     <li>DSL to describe deep networks : </li>
     <li style="list-style-type:none">
       <ul>
@@ -433,47 +450,150 @@ for i in xrange(training_steps):
         <li>Misc : <code>BeamSearch</code>, ...</li>
       </ul>
     </li>
+    <li>Also 'fuel' for Dataset wrangling</li>
    </ul>
+  </section>
   
+</section>
+
+<section>
+  <section>
+   <h2>ImageNet Results</h2>
+   <img width="574" height="469" src="img/ImageNet-Results_574x469.png" alt="ImageNet Results" style="border:none;box-shadow:none">
+   <p><i>(now human competitive on ImageNet)</i></p>
+  </section>
+  
+  <section>
+   <h2>What's Next?</h2>
+   <img width="665" height="208" src="img/diags_1329x416.jpeg" alt="Recurrent Overview" style="border:none;box-shadow:none">
+  </section>
+  
+  <section>
+   <h2>Image Labelling</h2>
+   <img width="642" height="484" src="img/image-labelling_642x484.png" alt="Image Labelling" style="border:none;box-shadow:none">
+  </section>
+
+  <section>
+   <h2>LSTM Units</h2>
+   <img width="412" height="470" src="img/LSTM_412x470.png" alt="LSTM" style="border:none;box-shadow:none">
+  </section>
+
+<!--  
+  <section>
+   <h2>Translation</h2>
+   <img width="665" height="208" src="img/diags_1329x416.jpeg" alt="Recurrent Overview" style="border:none;box-shadow:none">
+  </section>
+  
+  <section>
+   <h2>Speech to Text</h2>
+   <img width="665" height="208" src="img/diags_1329x416.jpeg" alt="Recurrent Overview" style="border:none;box-shadow:none">
+  </section>
+!-->
+</section>
+
+
+<section>
+  <section>
+   <h2>Recurrent Neural Network Demo</h2>
+  </section>
+  
+  <section>
+   <h2>Poetry : Epoch 1</h2>
+   <pre><code data-trim contenteditable>
+JDa&amp;g#sdWI&amp;MKW^gE)I}&amp;lt;UNK>f;6g)^5*|dXdBw6m\2&amp;XcXVy\ph8G&amp;lt;gAM&amp;>e4+mv5}OX8G*Yw9&amp;n3XW{h@&amp;T\Fk%BPMMI
+OV&amp;*C_] ._f$v4I~$@Z^&amp;[2
+mOVe`4W)"L-KClkO]wu]\$LCNadyo$h;>$jV7X$XK#4,T(y"sa6W0LWf\'_{\#XD]p%ck[;O`!Px\#E>/Or(.YZ|a]2}q|@a9.g3nV,U^qM	$+:nlk0sd;V-Z&amp;;7Y@Z "l-7P^C
+"xBF~~{n} n\ Pcbc9f?=y)FIc1h5kvjIi
+C&amp;lt;UNK>s	DWJr_$ZQtu"BTYm'|SMj-]Z&amp;lt;Vqj*.lh%IYW|q.GK:eNI"r>833?+RuUsOj_)a{\T}gH.zZR^(daC3mg5P0iFi]bqGo4?T|\>0_H&amp;g889voTh=~)^DDRYND46z1J]x;&amp;lt;U>>%eNIRckL)N8n&amp;lt;UNK>n3i)+Ln8
+?)9.#s7X]}$*sxZ"3tf ")
+@'HW.;I5)C.*%}&amp;lt;jcNLN+Z__RWoryOb#
+/`r
+   </code></pre>
+  </section>
+  
+  <section>
+   <h2>Poetry : Epoch 100</h2>
+   <pre><code data-trim contenteditable>
+Som the riscele his nreing the timest stordor hep pIs dach suedests her, so for farmauteds?
+By arnouy ig wore
+Thou hoasul dove he five grom ays he bare as bleen,
+The seend,
+And, an neeer,
+Whis with the rauk with, for be collenss ore his son froven faredure:
+Then andy bround'd the CowE nom shmlls everom thoy men ellone per in the lave ofpen the way ghiind, thour eyes in is ple gull heart sind, I I wild,
+Frreasuce anspeve, wrom fant beiver, not the afan
+And in thou' histwish a it wheme-tis lating ble the liveculd;
+Noorroint he fhallought, othelts.
+   </code></pre>
+  </section>
+  
+  <section>
+   <h2>Poetry : Epoch 1000</h2>
+   <pre><code data-trim contenteditable>
+AWhis grook my glass' to his sweet,
+Bub my fears liken?
+And of live every in seedher;
+A Lood stall,
+But tare tought than thencer sud earth,
+Use'st bee sechion,
+For all exprit' are a daud in heaven doth her infook perust the fork the tent.
+
+For maud,
+The pittent gover
+This and rimp,
+Who new
+  
+Thoir oldes and did hards, cound.
+   </code></pre>
+  </section>
+  
+  <section>
+   <h2>Plays : Epoch 338</h2>
+   <h3>Larger network...</h3>
+   <pre><code data-trim contenteditable>
+DEDENIUS	Why shoulmeying to to wife,
+	And thou say: and wall you teading for
+	that struke you down as sweet one.
+	With be more bornow, bly unjout on the account:
+	I duked you did four conlian unfortuned drausing-
+	to sicgia stranss, or not sleepplins his arms
+	Gentlemen? as write lord; gave sold.
+
+AENEMUUNS	Met that will knop unhian, where ever have
+	of the keep his jangst?icks he I love hide,
+	Jach heard which offen, sir!'
+
+	[Exit PATIIUS, MARGARUS arr	[Enter CLOTHUR]
+   </code></pre>
   </section>
 </section>
 
 <section>
   <section>
-   <h2>Recurrent Neural Networks</h2>
-   <img width="698" height="217" src="img/diags_1329x416.jpeg" alt="Recurrent Overview" style="border:none;box-shadow:none">
+   <h2>Theano?</h2>
+   <img width="665" height="208" src="img/diags_1329x416.jpeg" alt="Recurrent Overview" style="border:none;box-shadow:none">
   </section>
   
   <section>
-   <h2>'blocks' for Theano</h2>
-   <ul class="fix-spacing">
-    <li>Overlay on top of Theano</li>
-    <li>DSL to describe deep networks : </li>
-    <li style="list-style-type:none">
-      <ul>
-        <li>Initialization : <code>Constant</code>, <code>Gaussian</code>, <code>Orthonormal</code>, ...</li>
-        <li>Sigmoids : <code>Tanh</code>, <code>ReLU</code>, ...</li>
-        <li>Gradient Descent : <code>Momentum</code>, <code>ADAgrad</code>, ...</li>
-        <li>Cost Functions : <code>CategoricalCrossEntropy</code>, ...</li>
-        <li>Misc : <code>BeamSearch</code>, ...</li>
-      </ul>
-    </li>
-   </ul>
-  
+   <h2>Theano x10</h2>
+   <img width="642" height="484" src="img/image-labelling_642x484.png" alt="Image Labelling" style="border:none;box-shadow:none">
   </section>
 </section>
-
 
 <section>
  <h2>Wrap-up</h2>
  <ul class="fix-spacing">
   <li>Theano makes GPUs Python-friendly</li>
+  <li>Code on GitHub : "mdda"</li>
   <li style="list-style-type:none">
     <ul>
-      <li><em>(all code already on GitHub)</em></li>
+      <li>iPython Notebooks</li>
+      <li>Installation hints &amp; "Misc"</li>
+      <li><i>* Please Star *</i></li>
     </ul>
   </li>
  </ul>
+ <img width="453" height="188" src="img/GitHub_453x188.png" alt="GitHub" style="border:none;box-shadow:none">
 </section>
 
 
