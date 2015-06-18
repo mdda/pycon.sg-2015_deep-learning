@@ -244,38 +244,6 @@ End
 
 <section>
   <section>
-   <h2>My Basic Approach</h2>
-   <ul class="fix-spacing">
-    <li>Find where there's a word missing</li>
-    <li>For that position think up a word</li>
-    <li>Apply Deep Learning to score possibilities</li>
-   </ul>
-   <img width="700" height="131" src="img/img-to-cat_700x131.png" alt="Image to Cat" style="border:none;box-shadow:none">
-  </section>
-  <section>
-   <h2>Word Embedding</h2>
-   <p>How to handle 'discrete' things like Words?</p>
-   <img width="732" height="360" src="img/word-embedding_732x360.png" alt="Word Embedding" style="border:none;box-shadow:none">
-  </section>
-  <section>
-   <h2>Trainable on Wikipedia</h2>
-   <img width="700" height="267" src="img/embedding-training_700x267.png" alt="Word Embedding Training" style="border:none;box-shadow:none">
-   <p>5.7MM documents, 5.4Bn terms<br />&rarr; 155k words, 500-D embedding</p>
-  </section>
-  <section>
-   <h2>Finds Relationships</h2>
-   <img width="446" height="360" src="img/facts_446x360.png" alt="Word Embedding Facts" style="border:none;box-shadow:none">
-   <p>Ready-made Python module : Word2Vec</p>
-  </section>
-  <section>
-   <h2>Semantic too</h2>
-   <img width="535" height="289" src="img/grammar_535x289.png" alt="Word Embedding Grammar" style="border:none;box-shadow:none">
-   <p>This is pretty surprising, IMHO</p>
-  </section>
-</section>
-
-<section>
-  <section>
    <h2>Theano</h2>
    <ul class="fix-spacing">
     <li>Optimised Numerical Computation in Python</li>
@@ -326,110 +294,20 @@ train = theano.function(
 for i in xrange(training_steps):
     pred, err = train(data_X, data_y)   
    </code></pre>
-   <p>Iteration mechanism built-in</p>
-  </section>
-  <section>
-   <h2>Theano : Lasagne</h2>
-   <p>Thin 'NN' layer on top of regular Theano</p>
-   <pre><code data-trim contenteditable>
-l_in = lasagne.layers.InputLayer(
-    shape=(batch_size, 1, input_width, input_height) )
-    
-l_conv2 = cuda_convnet.Conv2DCCLayer( l_in,
-    num_filters=32, filter_size=(5, 5),
-    nonlinearity=lasagne.nonlinearities.rectify )
-    
-l_pool2 = cuda_convnet.MaxPool2DCCLayer( l_conv2, ds=(2, 2))
-
-l_hidden = lasagne.layers.DenseLayer( l_pool2, num_units=256,
-    nonlinearity=lasagne.nonlinearities.rectify )
-
-l_dropout = lasagne.layers.DropoutLayer(l_hidden, p=0.5)
-
-l_out = lasagne.layers.DenseLayer( l_dropout, num_units=output_dim,
-    nonlinearity=lasagne.nonlinearities.softmax )
-   </code></pre>
   </section>
 </section>
 
 
 <section>
-  <section>
-   <h2>1Bn Words ...</h2>
-   <ul class="fix-spacing">
-    <li>Size of DataSet is a problem</li>
-    <li>Word-Embedding is 'new'</li>
-    <li>Playing around with 'gaps' objective</li>
-   </ul>
-  </section>
-  <section>
-   <h2>DataSet size</h2>
-   <ul class="fix-spacing">
-    <li>Reduce training set to manageable size during dev.</li>
-    <li>Even so, 1MM sentences &rArr; 40MM training examples</li>
-    <li>Will eventually need to page data into GPU</li>
-    <li>Need to consider PCI bus bandwidth (epochs, etc)</li>
-   </ul>
-  </section>
-  <section>
-   <h2>Word Embedding</h2>
-   <ul class="fix-spacing">
-    <li>vocab.size &gt; 65k &rArr; word[&middot;] : int32</li>
-    <li>Training examples :</li>
-    <li style="list-style-type:none">
-     <ul>
-      <li>( word[i-1], word[i] ) &rarr; ( gap_type=0 )</li>
-      <li>( word[i-1], word[i+1] ) &rarr; ( gap_type>0 )</li>
-     </ul>
-    </li>
-    <li>Store 240-D vectors on GPU (150Mb)</li>
-    <li>Expand word-context to 480-D input vector</li>
-   </ul>
-  </section>
-  <section>
-   <h2>Gaps objective</h2>
-   <ul class="fix-spacing">
-    <li><code>gap_type</code> is softmax over 2+32 classes : </li>
-    <li style="list-style-type:none">
-      <ul>
-        <li>{ NoGap, ComplexGap } ++ </li>
-        <li>{ the , . to of a and in {N} " that 's for on is was with ... }</li>
-      </ul>
-    </li>
-    <li>Base case for <code>gap.best</code> &rArr; add a space</li>
-    <li>Filling known gap with uncertain word &rArr; Risky</li>
-   </ul>
-   <ximg width="700" height="131" src="img/img-to-cat_700x131.png" alt="Image to Cat" style="border:none;box-shadow:none">
-  </section>
-</section>
-
-<section>
-  <section>
-   <h2>Wrap-up</h2>
-   <ul class="fix-spacing">
-    <li>Kaggle Competitions are Cool</li>
-    <li>Word Embedding is Surprising</li>
-    <li>Theano makes GPUs Python-friendly</li>
-    <li><em>Will "Formally Announce" ASAP</em></li>
-    <li style="list-style-type:none">
-      <ul>
-        <li><em>(all code already on GitHub)</em></li>
-      </ul>
-    </li>
-   </ul>
-  </section>
-  <section>
-   <h2>The Future</h2>
-   <ul class="fix-spacing">
-    <li>This coming year (2015) = 'serious' :</li>
-    <li style="list-style-type:none">
-      <ul>
-        <li>Working for Local Company</li>
-        <li>Sole Focus : NLP (financial documents &rarr; relationships)</li>
-      </ul>
-    </li>
-   </ul>
-  </section>
+ <h2>Wrap-up</h2>
+ <ul class="fix-spacing">
+  <li>Theano makes GPUs Python-friendly</li>
+  <li style="list-style-type:none">
+    <ul>
+      <li><em>(all code already on GitHub)</em></li>
+    </ul>
+  </li>
+ </ul>
 </section>
 
 
