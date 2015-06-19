@@ -152,9 +152,9 @@ Also useful :
 
 ### Notes : Installing PyGPU
 
-Building the library : 
+Building the library from github FAILS : 
 ```
-TODO - including submitting PR for : 
+TODO - submitting PR for : 
            https://github.com/Theano/libgpuarray/issues/55
            """ gcc 5.1.1 : max_align_t also defined in stddef.h """
 ```
@@ -169,7 +169,13 @@ python setup.py build
 python setup.py install
 ```
 
+And there are still potentially python ``import`` problems to solve.
+
+
+
 ### Notes : Installing decent Nvidia packages on Fedora 22
+
+This is very much in-progress, since it doesn't yet work to my satisfaction...
 
 ```
 dnf install 'dnf-command(config-manager)'
