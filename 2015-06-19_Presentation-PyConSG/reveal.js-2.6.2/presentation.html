@@ -383,18 +383,32 @@ End
   <section>
    <h2>Bokeh : Hello World</h2>
    <p>First section of notebook</p>
+   <img width="700" height="394" src="img/ipython-bokeh-hello-world_700x394.png" alt="iPython/bokeh hello world" style="border:none;box-shadow:none">
   </section>
   
   <section>
    <h2>Theano : Gradient Descent</h2>
    <p>Using the blocks set-up</p>
    <pre><code data-trim contenteditable>
-     
+plotter = Plot('Plotting example', channels=[['cost','a']], after_batch=True)
+main_loop = MainLoop(
+     model=None, data_stream=data_stream,
+     algorithm=GradientDescent(cost=cost,
+                               params=[a],
+                               step_rule=Scale(learning_rate=0.01)),
+     extensions=[
+        FinishAfter(after_n_epochs=1),
+        TrainingDataMonitoring([cost, a], after_batch=True),
+        plotter,
+     ])  
+main_loop.run()     
    </code></pre>
   </section>
   
   <section>
    <h2>Blocks/Bokeh : Embedded graph</h2>
+   <p>Screen-grab during live output...</p>
+   <img width="478" height="400" src="img/ipython-live-plotting_478x400.png" alt="iPython/blocks/bokeh" style="border:none;box-shadow:none">
    <p>(PR submitted to <code>blocks-extras</code></p>
   </section>
 </section>
