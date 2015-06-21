@@ -372,44 +372,30 @@ End
   
   <section>
    <h2>Graphing Demo</h2>
+   <br />
+   <pre><code data-trim contenteditable>
+#From : https://github.com/mdda
+#Repo : pycon.sg-2015_deep-learning
+#Open : ipynb / 1-LivePlotting.ipynb
+   </code></pre>
   </section>
   
   <section>
-   <h2>Theano : Basic</h2>
-   <p>Function 'built up', then evaluated</p>
+   <h2>Bokeh : Hello World</h2>
+   <p>First section of notebook</p>
+  </section>
+  
+  <section>
+   <h2>Theano : Gradient Descent</h2>
+   <p>Using the blocks set-up</p>
    <pre><code data-trim contenteditable>
-import theano.tensor as T
-x = T.matrix("x") # Declare Theano symbolic variables
-y = T.vector("y")
-w = theano.shared(rng.randn(feats), name="w")
-b = theano.shared(0., name="b")
-
-# Construct Theano expression graph
-p_1 = 1 / (1 + T.exp(-T.dot(x, w) - b))   # Probability that target = 1
-prediction = p_1 > 0.5                    # The prediction thresholded
-
-predict = theano.function(inputs=[x], outputs=prediction)
-
-print predict( [0.1, .02, ... , -7.4, 3.2] )
+     
    </code></pre>
   </section>
+  
   <section>
-   <h2>Theano : Iterative</h2>
-   <p>Gradients come 'free'</p>
-   <pre><code data-trim contenteditable>
-xent = -y * T.log(p_1) - (1-y) * T.log(1-p_1) # Cross-entropy loss fn
-cost = xent.mean() + 0.01 * (w ** 2).sum()    # Minimize this
-
-gw, gb = T.grad(cost, [w, b])  # Compute the gradient of the cost
-
-train = theano.function( 
-          inputs=[x,y],
-          outputs=[prediction, xent],
-          updates=((w, w - 0.1 * gw), (b, b - 0.1 * gb)))
-
-for i in xrange(training_steps):
-    pred, err = train(data_X, data_y)   
-   </code></pre>
+   <h2>Blocks/Bokeh : Embedded graph</h2>
+   <p>(PR submitted to <code>blocks-extras</code></p>
   </section>
 </section>
 
@@ -506,6 +492,12 @@ for i in xrange(training_steps):
 <section>
   <section>
    <h2>Recurrent Neural Network Demo</h2>
+   <br />
+   <pre><code data-trim contenteditable>
+#From : https://github.com/mdda
+#Repo : pycon.sg-2015_deep-learning
+#Open : ipynb / 6-RNN-as-Author.ipynb
+   </code></pre>
   </section>
   
   <section>
