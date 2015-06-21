@@ -152,43 +152,12 @@ Also useful :
 
 ### Notes : Installing PyGPU
 
-Building the library from github FAILS : 
+On the date of the PyCon, building the ``libgpuarray`` library from github FAILS : 
 ```
-TODO - submitting PR for : 
+NOW DONE - submitted a PR for : 
            https://github.com/Theano/libgpuarray/issues/55
            """ gcc 5.1.1 : max_align_t also defined in stddef.h """
 ```
 
-Installing the Python component: 
-
-```
-cd ~/env/
-git clone https://github.com/Theano/libgpuarray.git
-cd libgpuarray/
-python setup.py build
-python setup.py install
-```
-
-And there are still potentially python ``import`` problems to solve.
-
-
-
-### Notes : Installing decent Nvidia packages on Fedora 22
-
-This is very much in-progress, since it doesn't yet work to my satisfaction...
-
-```
-dnf install 'dnf-command(config-manager)'
-dnf config-manager --add-repo=http://negativo17.org/repos/fedora-nvidia.repo
-dnf remove \*nvidia\*
-dnf -y install nvidia-driver akmod-nvidia kernel-devel
-dnf -y install cuda-devel nvidia-driver-devel
-```
-
-```
-THEANO_FLAGS=floatX=float32,device=gpu  
-```
-
-```
-python `python -c "import os, theano; print os.path.dirname(theano.__file__)"`/misc/check_blas.py
-```
+There is a full write-up on how to install an Nvidia GPU under Fedora 22 
+as a [blog posting](http://blog.mdda.net/oss/2015/06/20/nvidia-on-fedora-22/)
