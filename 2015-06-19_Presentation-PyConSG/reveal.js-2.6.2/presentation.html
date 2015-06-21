@@ -513,6 +513,37 @@ main_loop.run()
 #Open : ipynb / 6-RNN-as-Author.ipynb
    </code></pre>
   </section>
+
+  <section>
+   <h2>Blocks : Simple Recurrent</h2>
+   <pre><code data-trim contenteditable>
+transition = GatedRecurrent(name="transition", dim=hidden_state_dim, activation=Tanh())
+generator =  SequenceGenerator(
+  Readout(readout_dim=num_states, source_names=["states"],
+          emitter=SoftmaxEmitter(name="emitter"),
+          feedback_brick=LookupFeedback(
+              num_states, feedback_dim, name='feedback'),
+          name="readout"),
+  transition,
+  weights_init=IsotropicGaussian(0.01), biases_init=Constant(0),
+  name="generator"
+)
+   </code></pre>
+  </section>
+
+  <section>
+   <h2>Training / Testing</h2>
+   <ul class="fix-spacing">
+    <li>Code includes two <code>ComputationGraph</code>s</li>
+    <li style="list-style-type:none">
+      <ul>
+        <li>Training : Uses character-wise data from files</li>
+        <li>Testing  : Greedily produces 1000 characters</li>
+      </ul>
+    </li>
+    <li>Easy to see results in 10-20mins of training</li>
+   </ul>
+  </section>
   
   <section>
    <h2>Poetry : Epoch 1</h2>
