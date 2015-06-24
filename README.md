@@ -161,3 +161,7 @@ NOW DONE - submitted a PR for :
 
 There is a full write-up on how to install an Nvidia GPU under Fedora 22 
 as a [blog posting](http://blog.mdda.net/oss/2015/06/20/nvidia-on-fedora-22/)
+
+And an additional write-up for the case that you're installing to a laptop
+with 'dual graphics cards' 
+in [this blog post](http://blog.mdda.net/oss/2015/06/20/nvidia-on-fedora-22-laptop/).
