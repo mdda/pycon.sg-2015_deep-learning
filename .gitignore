@@ -7,6 +7,8 @@ ipynb/tutorial.*
 data/*.txt
 data/*/
 
+models/
+
 .geany/
 env/
 
