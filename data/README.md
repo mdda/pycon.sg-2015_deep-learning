@@ -1,10 +1,14 @@
 ## Obtaining Data
 
+These instructions can be used to create datafiles useful for 
+characterwise learning (as required by ``ipynb/6-RNN-as-Author.ipynb``, for instance)
+
+
 ### Collection of Paul Graham Essays
 
 Helpfully, there's a [https://github.com/rohitsm/PGEssays](GitHub repo) with the essays already downloaded.
 
-To create a useful characterwise training (as required by ``ipynb/6-RNN-as-Author.ipynb``, for instance) :
+To create a training file :
 
 ```
 cd data # `pwd` == REPO/data
@@ -23,7 +27,7 @@ This leaves a 2.4Mb file of Paul Graham generated text in ``./data/PG-content.tx
 Helpfully, there's a [whole site](http://sydney.edu.au/engineering/it/~matty/Shakespeare/) 
 dedicated to downloading Shakespeare's works.
 
-To create a useful characterwise training (as required by ``ipynb/6-RNN-as-Author.ipynb``, for instance) :
+To create a training file :
 
 ```
 cd data # `pwd` == REPO/data
