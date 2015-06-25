@@ -43,6 +43,14 @@ https://gist.github.com/rizar/183620f9cfec98f2acd4
 This has additional classes that together can build a deep, bidirectional encoder
 """
 
+"""
+stack of LSTM
+
+https://github.com/mila-udem/blocks/pull/688  :: Accepted! (Code is in ...)
+
+Update blocks- 
+
+"""
 
 mlp = MLP([Softmax()], [embedding_dim, labels_size],
           weights_init=IsotropicGaussian(0.01),
