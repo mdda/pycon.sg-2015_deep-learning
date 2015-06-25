@@ -50,7 +50,7 @@ https://github.com/mila-udem/blocks/pull/688  :: Accepted! (Code is in 'blocks' 
 
 Update blocks from git in env 
 pip install git+git://github.com/mila-udem/blocks.git@master
-   -- suggests it needs '--upgrade' 
+   -- suggests it needs '--upgrade' (even "pip uninstall" doesn't work)
    -- So, need to clone separately, and do :
    python setup.py install  
    # or
