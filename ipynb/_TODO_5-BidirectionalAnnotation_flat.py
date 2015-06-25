@@ -49,7 +49,12 @@ stack of LSTM
 https://github.com/mila-udem/blocks/pull/688  :: Accepted! (Code is in 'blocks' core repo)
 
 Update blocks from git in env 
-
+pip install git+git://github.com/mila-udem/blocks.git@master
+   -- suggests it needs '--upgrade' 
+   -- So, need to clone separately, and do :
+   python setup.py install  
+   # or
+   python setup.py develop
 """
 
 mlp = MLP([Softmax()], [embedding_dim, labels_size],
