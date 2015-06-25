@@ -25,6 +25,25 @@ lookup = LookupTable(vocab_size, embedding_dim)
 
 encoder = Bidirectional(SimpleRecurrent(dim=embedding_dim, activation=Tanh()))
 
+"""
+Cost functions that respect masks for variable-length input (produced with Padding)
+
+https://groups.google.com/forum/#!topic/blocks-users/O-S45G6tpNY
+Including target sequence mask in cost function for recurrent network
+
+https://github.com/mila-udem/blocks/issues/653
+Cost for recurrent networks
+"""
+
+"""
+Deep BiRNN for Blocks
+
+https://gist.github.com/rizar/183620f9cfec98f2acd4
+
+This has additional classes that together can build a deep, bidirectional encoder
+"""
+
+
 mlp = MLP([Softmax()], [embedding_dim, labels_size],
           weights_init=IsotropicGaussian(0.01),
           biases_init=Constant(0))
