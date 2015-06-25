@@ -46,9 +46,9 @@ This has additional classes that together can build a deep, bidirectional encode
 """
 stack of LSTM
 
-https://github.com/mila-udem/blocks/pull/688  :: Accepted! (Code is in ...)
+https://github.com/mila-udem/blocks/pull/688  :: Accepted! (Code is in 'blocks' core repo)
 
-Update blocks- 
+Update blocks from git in env 
 
 """
 
