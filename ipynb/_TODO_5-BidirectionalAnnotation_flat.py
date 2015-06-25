@@ -33,6 +33,9 @@ Including target sequence mask in cost function for recurrent network
 
 https://github.com/mila-udem/blocks/issues/653
 Cost for recurrent networks
+
+See mask reshape/multiplication for costs somewhere near :
+https://github.com/mila-udem/blocks/blob/master/blocks/bricks/sequence_generators.py#L277
 """
 
 """
@@ -50,11 +53,19 @@ https://github.com/mila-udem/blocks/pull/688  :: Accepted! (Code is in 'blocks' 
 
 Update blocks from git in env 
 pip install git+git://github.com/mila-udem/blocks.git@master
-   -- suggests it needs '--upgrade' (even "pip uninstall" doesn't work)
-   -- So, need to clone separately, and do :
-   python setup.py install  
-   # or
-   python setup.py develop
+   -- suggests it needs '--upgrade' : Meh
+   -- Direct approach with uninstall first (works without the git+git knobs):
+         pip uninstall blocks
+         # Fortunately, this doesn't touch the blocks-extras code (?)
+         pip install git+git://github.com/mila-udem/blocks.git@master
+   -- Alternative is to clone separately, and do :
+         python setup.py install  
+         # or
+         python setup.py develop
+         
+Usage of RecurrentStack :
+https://github.com/sotelo/poet/blob/master/poet.py
+         
 """
 
 mlp = MLP([Softmax()], [embedding_dim, labels_size],
