@@ -4,5 +4,13 @@ ipynb/.ipynb_checkpoints
 notes.txt
 ipynb/tutorial.*
 
+data/*.txt
+data/*/
+
+models/
+
 .geany/
 env/
+
+2015-06-19_Presentation-PyConSG/*.gz
+2015-06-19_Presentation-PyConSG/reveal.js*/
