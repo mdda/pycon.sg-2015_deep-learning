@@ -22,6 +22,9 @@ embedding_dim=3
 hidden_dim=5
 labels_size=10
 
+max_sentence_length = 29
+mini_batch_size = 128
+
 """
 Cost functions that respect masks for variable-length input (produced with Padding)
 
@@ -81,15 +84,28 @@ encoder = Bidirectional(SimpleRecurrent(dim=hidden_dim, activation=Tanh()))
 ### But need to reshape here, I think...
 
 hidden_to_output = Linear(name='hidden_to_output', input_dim=hidden_dim, output_dim=labels_size)
-y_hat = Softmax().apply(hidden_to_output.apply(encoder))
+
+
+# x looks like it should be max_sentence_length rows and mini_batch_size columns
+tensor.reshape(x, (max_sentence_length, mini_batch_size)  )
+
+rnn_outputs = encoder.apply(lookup.apply(x))
+y_hat = Softmax().apply(hidden_to_output.apply(rnn_outputs))
+
+
+y = tensor.lmatrix('targets')
+tensor.reshape(y, (max_sentence_length, mini_batch_size) )
+
+cost = CategoricalCrossEntropy().apply(y.flatten(), y_hat)
 
 ## Less explicit version
 #mlp = MLP([Softmax()], [hidden_dim, labels_size],
 #          weights_init=IsotropicGaussian(0.01),
 #          biases_init=Constant(0))
 
-y = tensor.lmatrix('targets')
-cost = CategoricalCrossEntropy().apply(y.flatten(), y_hat)
+
+
+
 
 #print(encoder.prototype.apply.sequences)
 #dir(encoder.prototype.apply.sequences)
