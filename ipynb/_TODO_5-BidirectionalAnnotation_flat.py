@@ -17,13 +17,10 @@ from blocks.graph import ComputationGraph
 from blocks.filter import VariableFilter
 from blocks.roles import INPUT, WEIGHT, OUTPUT
 
-vocab_size=3
+vocab_size=4
 embedding_dim=3
+hidden_dim=5
 labels_size=10
-
-lookup = LookupTable(vocab_size, embedding_dim)
-
-encoder = Bidirectional(SimpleRecurrent(dim=embedding_dim, activation=Tanh()))
 
 """
 Cost functions that respect masks for variable-length input (produced with Padding)
@@ -68,22 +65,41 @@ https://github.com/sotelo/poet/blob/master/poet.py
          
 """
 
-mlp = MLP([Softmax()], [embedding_dim, labels_size],
-          weights_init=IsotropicGaussian(0.01),
-          biases_init=Constant(0))
+"""
+Comments indicate that a reshaping has to be done, so let's think 
+about sizes of the arrays...
 
-print(encoder.prototype.apply.sequences)
+"""
+
+x = tensor.lmatrix('data')
+#x = tensor.imatrix('features')
+
+lookup = LookupTable(vocab_size, embedding_dim)
+
+encoder = Bidirectional(SimpleRecurrent(dim=hidden_dim, activation=Tanh()))
+
+### But need to reshape here, I think...
+
+hidden_to_output = Linear(name='hidden_to_output', input_dim=hidden_dim, output_dim=labels_size)
+y_hat = Softmax().apply(hidden_to_output.apply(encoder))
+
+## Less explicit version
+#mlp = MLP([Softmax()], [hidden_dim, labels_size],
+#          weights_init=IsotropicGaussian(0.01),
+#          biases_init=Constant(0))
+
+y = tensor.lmatrix('targets')
+cost = CategoricalCrossEntropy().apply(y.flatten(), y_hat)
+
+#print(encoder.prototype.apply.sequences)
 #dir(encoder.prototype.apply.sequences)
 
 #combine = Merge(input_dims=dict(), output_dim=labels_size)
 #labelled = Softmax( encoder )
 
 
-x = tensor.imatrix('features')
-y = tensor.imatrix('targets')
-
-probs = encoder.apply(lookup.apply(x))
-cg = ComputationGraph([probs])
+#probs = encoder.apply(lookup.apply(x))
+#cg = ComputationGraph([probs])
 
 #probs = mlp.apply(encoder.apply(lookup.apply(x)))
 #cost = CategoricalCrossEntropy().apply(y.flatten(), probs)
@@ -104,3 +120,8 @@ print( VariableFilter(roles=[OUTPUT])(cg.variables) )
 #fork.input_dim = dimension
 #fork.output_dims = [dimension for name in fork.input_names]
 #print(fork.output_dims)
+
+cost = aggregation.mean(generator.cost_matrix(x[:, :]).sum(), x.shape[1])
+cost.name = "sequence_log_likelihood"
+model=Model(cost)
+
