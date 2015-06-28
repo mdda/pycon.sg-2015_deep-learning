@@ -25,6 +25,8 @@ labels_size=10
 max_sentence_length = 29
 mini_batch_size = 128
 
+batch_of_sentences = (max_sentence_length, mini_batch_size)
+
 """
 Cost functions that respect masks for variable-length input (produced with Padding)
 
@@ -74,27 +76,33 @@ about sizes of the arrays...
 
 """
 
-x = tensor.lmatrix('data')
-#x = tensor.imatrix('features')
-
 lookup = LookupTable(vocab_size, embedding_dim)
 
-encoder = Bidirectional(SimpleRecurrent(dim=hidden_dim, activation=Tanh()))
+rnn = Bidirectional(SimpleRecurrent(dim=hidden_dim, activation=Tanh()))
 
-### But need to reshape here, I think...
+### But will need to reshape the rnn outputs to produce suitable input here...
+gather = Linear(name='hidden_to_output', input_dim=hidden_dim, output_dim=labels_size)
 
-hidden_to_output = Linear(name='hidden_to_output', input_dim=hidden_dim, output_dim=labels_size)
+### But will need to reshape the rnn outputs to produce suitable input here...
+labels = Softmax()
 
 
-# x looks like it should be max_sentence_length rows and mini_batch_size columns
-tensor.reshape(x, (max_sentence_length, mini_batch_size)  )
+## Now for the application of these units
 
-rnn_outputs = encoder.apply(lookup.apply(x))
-y_hat = Softmax().apply(hidden_to_output.apply(rnn_outputs))
+x = tensor.lmatrix('data')
+# Define the shape of x specifically... 
+# looks like it should be max_sentence_length rows and mini_batch_size columns
+tensor.reshape(x, batch_of_sentences  )
+
+rnn_outputs = rnn.apply(lookup.apply(x))
+
+pre_softmax = gather.apply(rnn_outputs)
+
+y_hat = labels.apply(pre_softmax)
 
 
 y = tensor.lmatrix('targets')
-tensor.reshape(y, (max_sentence_length, mini_batch_size) )
+tensor.reshape(y, batch_of_sentences )
 
 cost = CategoricalCrossEntropy().apply(y.flatten(), y_hat)
 
