@@ -21,7 +21,7 @@ from blocks.roles import INPUT, WEIGHT, OUTPUT
 theano.config.compute_test_value = 'raise'
 
 vocab_size=4
-embedding_dim=81
+embedding_dim=40
 hidden_dim=5  # This is a problem...
 hidden_dim=embedding_dim  # This seems to be the expectation
 labels_size=10
