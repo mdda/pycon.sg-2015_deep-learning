@@ -106,7 +106,7 @@ print("lookup.params=", lookup.params)
 #lookup.weights_init = FUNCTION
 #lookup.initialize() 
 #lookup.params[0].set_value( np.random.normal( scale = 0.1, size=(vocab_size, embedding_dim) ) )
-lookup.params[0].set_value( np.random.normal( scale = 0.1, size=(vocab_size+1, embedding_dim) ).astype(np.float32) )
+lookup.params[0].set_value( np.random.normal( scale = 0.1, size=(vocab_size, embedding_dim) ).astype(np.float32) )
 
 ## Now for the application of these units
 
@@ -133,10 +133,19 @@ print("rnn_outputs shape", np.shape(rnn_outputs).tag.test_value)
 
 
 ### But will need to reshape the rnn outputs to produce suitable input here...
-pre_softmax = gather.apply(rnn_outputs)
+rnn_outputs_reshaped = rnn_outputs.reshape( (max_sentence_length*mini_batch_size, hidden_dim*2) )
+#rnn_outputs_reshaped = rnn_outputs
+print("rnn_outputs_reshaped shape", np.shape(rnn_outputs_reshaped).tag.test_value)
+
+pre_softmax = gather.apply(rnn_outputs_reshaped)
+
+print("pre_softmax shape", np.shape(pre_softmax).tag.test_value)
+#('pre_softmax shape', array([ 29, 128,  10]))
 
 # Received a tensor here...
 y_hat = labels.apply(pre_softmax)
+
+print("y_hat shape", np.shape(y_hat).tag.test_value)
 
 
 y = tensor.lmatrix('targets')
