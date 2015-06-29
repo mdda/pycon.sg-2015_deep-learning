@@ -17,17 +17,23 @@ from blocks.graph import ComputationGraph
 from blocks.filter import VariableFilter
 from blocks.roles import INPUT, WEIGHT, OUTPUT
 
+theano.config.floatX = 'float32'
 # theano.config.assert_no_cpu_op='raise'
+
 theano.config.compute_test_value = 'raise'
 
 vocab_size=4
 embedding_dim=40
-hidden_dim=5  # This is a problem...
+
+#hidden_dim=34  # This is a problem... if it is not the same as the embedding
 hidden_dim=embedding_dim  # This seems to be the expectation
+
 labels_size=10
 
 max_sentence_length = 29
 mini_batch_size = 128
+# This becomes the size of the RNN 'output', 
+# each place with a hidden_dim vector
 
 batch_of_sentences = (max_sentence_length, mini_batch_size)
 
@@ -100,7 +106,7 @@ print("lookup.params=", lookup.params)
 #lookup.weights_init = FUNCTION
 #lookup.initialize() 
 #lookup.params[0].set_value( np.random.normal( scale = 0.1, size=(vocab_size, embedding_dim) ) )
-lookup.params[0].set_value( np.random.normal( scale = 0.1, size=(vocab_size+1, embedding_dim) ) )
+lookup.params[0].set_value( np.random.normal( scale = 0.1, size=(vocab_size+1, embedding_dim) ).astype(np.float32) )
 
 ## Now for the application of these units
 
@@ -123,6 +129,9 @@ embedding = lookup.apply(x)
 rnn_outputs = rnn.apply(embedding)
 
 print("rnn_outputs shape", np.shape(rnn_outputs).tag.test_value)
+#('rnn_outputs shape', array([ 29, 128,  80]))
+
+### But will need to reshape the rnn outputs to produce suitable input here...
 pre_softmax = gather.apply(rnn_outputs)
 
 # Received a tensor here...
