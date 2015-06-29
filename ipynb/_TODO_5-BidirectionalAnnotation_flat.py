@@ -93,7 +93,11 @@ lookup = LookupTable(vocab_size, embedding_dim)
 rnn = Bidirectional(SimpleRecurrent(dim=hidden_dim, activation=Tanh()))
 
 ### But will need to reshape the rnn outputs to produce suitable input here...
-gather = Linear(name='hidden_to_output', input_dim=hidden_dim*2, output_dim=labels_size)
+gather = Linear(name='hidden_to_output', 
+  input_dim=hidden_dim*2, output_dim=labels_size,
+  weights_init=IsotropicGaussian(0.01),
+  biases_init=Constant(0)
+)
 
 ### But will need to reshape the rnn outputs to produce suitable input here...
 labels = Softmax()
@@ -131,26 +135,28 @@ print("rnn_outputs shape", np.shape(rnn_outputs).tag.test_value)
 
 
 ### But will need to reshape the rnn outputs to produce suitable input here...
+
 rnn_outputs_reshaped = rnn_outputs.reshape( (max_sentence_length*mini_batch_size, hidden_dim*2) )
 #rnn_outputs_reshaped = rnn_outputs
-print("rnn_outputs_reshaped shape", np.shape(rnn_outputs_reshaped).tag.test_value)
 
+print("rnn_outputs_reshaped shape", np.shape(rnn_outputs_reshaped).tag.test_value)
+#('rnn_outputs_reshaped shape', array([3712,   80]))
+
+# Convert a tensor here into a long stream of vectors
 pre_softmax = gather.apply(rnn_outputs_reshaped)
 
 print("pre_softmax shape", np.shape(pre_softmax).tag.test_value)
-#('pre_softmax shape', array([ 29, 128,  10]))
+#('pre_softmax shape', array([ 29*128,  10]))
 
-# Received a tensor here...
 y_hat = labels.apply(pre_softmax)
-
-#print("y_hat shape", np.shape(y_hat).tag.test_value)
 print("y_hat shape", np.shape(y_hat).tag.test_value)
-
 
 y = tensor.lmatrix('targets')
 y.tag.test_value = np.random.randint( vocab_size, size=batch_of_sentences )
 #tensor.reshape(y, batch_of_sentences )
+
 print("y shape", y.shape.tag.test_value)
+# ('y shape', array([ 29, 128]))
 
 cost = CategoricalCrossEntropy().apply(y.flatten(), y_hat)
 
@@ -159,26 +165,17 @@ cost = CategoricalCrossEntropy().apply(y.flatten(), y_hat)
 #          weights_init=IsotropicGaussian(0.01),
 #          biases_init=Constant(0))
 
-
-
-
-
 #print(encoder.prototype.apply.sequences)
 #dir(encoder.prototype.apply.sequences)
-
-#combine = Merge(input_dims=dict(), output_dim=labels_size)
-#labelled = Softmax( encoder )
-
-
-#probs = encoder.apply(lookup.apply(x))
-#cg = ComputationGraph([probs])
 
 #probs = mlp.apply(encoder.apply(lookup.apply(x)))
 #cost = CategoricalCrossEntropy().apply(y.flatten(), probs)
 #cg = ComputationGraph([cost])
 
+cg = ComputationGraph([cost])
+
 #print(cg.variables)
-print( VariableFilter(roles=[OUTPUT])(cg.variables) )
+#print( VariableFilter(roles=[OUTPUT])(cg.variables) )
 
 #dir(cg.outputs)
 #np.shape(cg.outputs)
@@ -193,7 +190,8 @@ print( VariableFilter(roles=[OUTPUT])(cg.variables) )
 #fork.output_dims = [dimension for name in fork.input_names]
 #print(fork.output_dims)
 
-cost = aggregation.mean(generator.cost_matrix(x[:, :]).sum(), x.shape[1])
-cost.name = "sequence_log_likelihood"
-model=Model(cost)
+if False:
+  cost = aggregation.mean(generator.cost_matrix(x[:, :]).sum(), x.shape[1])
+  cost.name = "sequence_log_likelihood"
+  model=Model(cost)
 
