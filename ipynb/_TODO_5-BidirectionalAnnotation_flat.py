@@ -100,7 +100,7 @@ gather = Linear(name='hidden_to_output',
 )
 
 ### But will need to reshape the rnn outputs to produce suitable input here...
-labels = Softmax()
+p_labels = Softmax()
 
 
 ## Let's initialize some stuff
@@ -116,6 +116,7 @@ lookup.params[0].set_value( np.random.normal( scale = 0.1, size=(vocab_size, emb
 
 # Define the shape of x specifically... 
 # looks like it should be max_sentence_length rows and mini_batch_size columns
+##  But how does this square with Cost() requiring """that the data has format (batch, features)."""
 
 x.tag.test_value = np.random.randint(vocab_size, size=batch_of_sentences )
 
@@ -143,13 +144,14 @@ print("rnn_outputs_reshaped shape", np.shape(rnn_outputs_reshaped).tag.test_valu
 #('rnn_outputs_reshaped shape', array([3712,   80]))
 
 # Convert a tensor here into a long stream of vectors
-pre_softmax = gather.apply(rnn_outputs_reshaped)
+raw_labels = gather.apply(rnn_outputs_reshaped)
 
-print("pre_softmax shape", np.shape(pre_softmax).tag.test_value)
-#('pre_softmax shape', array([ 29*128,  10]))
+print("raw_labels shape", np.shape(raw_labels).tag.test_value)
+#('raw_labels shape', array([ 29*128,  10]))
 
-y_hat = labels.apply(pre_softmax)
+y_hat = p_labels.apply(raw_labels)
 print("y_hat shape", np.shape(y_hat).tag.test_value)
+#('y_hat shape', array([3712,   10]))  # -- so this is an in-place rescaling
 
 y = tensor.lmatrix('targets')
 y.tag.test_value = np.random.randint( vocab_size, size=batch_of_sentences )
@@ -171,6 +173,15 @@ cost = CategoricalCrossEntropy().apply(y.flatten(), y_hat)
 #probs = mlp.apply(encoder.apply(lookup.apply(x)))
 #cost = CategoricalCrossEntropy().apply(y.flatten(), probs)
 #cg = ComputationGraph([cost])
+
+# Alternatively, during test-time
+labels_list = y_hat.argmax(axis=1)
+print("labels_list shape", np.shape(labels_list).tag.test_value)
+#('labels_list shape', array([3712]))
+
+labels = labels_list.reshape( (max_sentence_length,mini_batch_size) )
+print("labels shape", np.shape(labels).tag.test_value)
+#('labels shape', array([ 29, 128]))
 
 cg = ComputationGraph([cost])
 
