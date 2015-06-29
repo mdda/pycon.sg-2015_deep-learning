@@ -18,6 +18,7 @@ from blocks.filter import VariableFilter
 from blocks.roles import INPUT, WEIGHT, OUTPUT
 
 # theano.config.assert_no_cpu_op='raise'
+theano.config.compute_test_value = 'raise'
 
 vocab_size=4
 embedding_dim=3
@@ -91,17 +92,20 @@ labels = Softmax()
 
 ## Now for the application of these units
 
-x_base = tensor.lmatrix('data')
+x = tensor.lmatrix('data')
+x.tag.test_value = np.random.randint(vocab_size, size=batch_of_sentences )
 
 # Define the shape of x specifically... 
 # looks like it should be max_sentence_length rows and mini_batch_size columns
 #tensor.reshape(x, batch_of_sentences  )
-x = tensor.specify_shape(x_base, batch_of_sentences)
-print("x (new) shape", x.shape)
+
+#x = tensor.specify_shape(x_base, batch_of_sentences)
+#print("x (new) shape", x.shape.eval())
+print("x (new) shape", x.shape.tag.test_value)
 
 rnn_outputs = rnn.apply(lookup.apply(x))
 
-print("rnn_outputs shape", np.shape(rnn_outputs))
+print("rnn_outputs shape", np.shape(rnn_outputs).tag.test_value)
 pre_softmax = gather.apply(rnn_outputs)
 
 # Received a tensor here...
