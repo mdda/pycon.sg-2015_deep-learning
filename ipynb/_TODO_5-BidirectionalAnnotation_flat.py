@@ -120,9 +120,7 @@ x.tag.test_value = np.random.randint(vocab_size, size=batch_of_sentences )
 #print("x (new) shape", x.shape.eval())
 
 print("x (new) shape", x.shape.tag.test_value)
-
-
-#lookup.tag.test_value = np.random.randint(vocab_size, size=batch_of_sentences )
+print("x (new) shape", np.shape(x).tag.test_value)
 
 embedding = lookup.apply(x)
 
@@ -145,11 +143,14 @@ print("pre_softmax shape", np.shape(pre_softmax).tag.test_value)
 # Received a tensor here...
 y_hat = labels.apply(pre_softmax)
 
+#print("y_hat shape", np.shape(y_hat).tag.test_value)
 print("y_hat shape", np.shape(y_hat).tag.test_value)
 
 
 y = tensor.lmatrix('targets')
-tensor.reshape(y, batch_of_sentences )
+y.tag.test_value = np.random.randint( vocab_size, size=batch_of_sentences )
+#tensor.reshape(y, batch_of_sentences )
+print("y shape", y.shape.tag.test_value)
 
 cost = CategoricalCrossEntropy().apply(y.flatten(), y_hat)
 
