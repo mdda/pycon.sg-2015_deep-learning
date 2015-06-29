@@ -33,7 +33,7 @@ labels_size=10
 max_sentence_length = 29
 mini_batch_size = 128
 # This becomes the size of the RNN 'output', 
-# each place with a hidden_dim vector
+# each place with a (hidden_dim*2) vector (x2 because it's bidirectional)
 
 batch_of_sentences = (max_sentence_length, mini_batch_size)
 
@@ -93,7 +93,7 @@ lookup = LookupTable(vocab_size, embedding_dim)
 rnn = Bidirectional(SimpleRecurrent(dim=hidden_dim, activation=Tanh()))
 
 ### But will need to reshape the rnn outputs to produce suitable input here...
-gather = Linear(name='hidden_to_output', input_dim=hidden_dim, output_dim=labels_size)
+gather = Linear(name='hidden_to_output', input_dim=hidden_dim*2, output_dim=labels_size)
 
 ### But will need to reshape the rnn outputs to produce suitable input here...
 labels = Softmax()
@@ -130,6 +130,7 @@ rnn_outputs = rnn.apply(embedding)
 
 print("rnn_outputs shape", np.shape(rnn_outputs).tag.test_value)
 #('rnn_outputs shape', array([ 29, 128,  80]))
+
 
 ### But will need to reshape the rnn outputs to produce suitable input here...
 pre_softmax = gather.apply(rnn_outputs)
