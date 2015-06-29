@@ -21,8 +21,9 @@ from blocks.roles import INPUT, WEIGHT, OUTPUT
 theano.config.compute_test_value = 'raise'
 
 vocab_size=4
-embedding_dim=3
-hidden_dim=5
+embedding_dim=81
+hidden_dim=5  # This is a problem...
+hidden_dim=embedding_dim  # This seems to be the expectation
 labels_size=10
 
 max_sentence_length = 29
@@ -76,10 +77,12 @@ https://github.com/sotelo/poet/blob/master/poet.py
 """
 Comments indicate that a reshaping has to be done, so let's think 
 about sizes of the arrays...
-
 """
 
+x = tensor.lmatrix('data')
+
 lookup = LookupTable(vocab_size, embedding_dim)
+#?? lookup.print_shapes=True
 
 rnn = Bidirectional(SimpleRecurrent(dim=hidden_dim, activation=Tanh()))
 
@@ -90,20 +93,34 @@ gather = Linear(name='hidden_to_output', input_dim=hidden_dim, output_dim=labels
 labels = Softmax()
 
 
-## Now for the application of these units
+## Let's initialize some stuff
+lookup.allocate()
+print("lookup.params=", lookup.params)
 
-x = tensor.lmatrix('data')
-x.tag.test_value = np.random.randint(vocab_size, size=batch_of_sentences )
+#lookup.weights_init = FUNCTION
+#lookup.initialize() 
+#lookup.params[0].set_value( np.random.normal( scale = 0.1, size=(vocab_size, embedding_dim) ) )
+lookup.params[0].set_value( np.random.normal( scale = 0.1, size=(vocab_size+1, embedding_dim) ) )
+
+## Now for the application of these units
 
 # Define the shape of x specifically... 
 # looks like it should be max_sentence_length rows and mini_batch_size columns
-#tensor.reshape(x, batch_of_sentences  )
 
+x.tag.test_value = np.random.randint(vocab_size, size=batch_of_sentences )
+
+#tensor.reshape(x, batch_of_sentences  )
 #x = tensor.specify_shape(x_base, batch_of_sentences)
 #print("x (new) shape", x.shape.eval())
+
 print("x (new) shape", x.shape.tag.test_value)
 
-rnn_outputs = rnn.apply(lookup.apply(x))
+
+#lookup.tag.test_value = np.random.randint(vocab_size, size=batch_of_sentences )
+
+embedding = lookup.apply(x)
+
+rnn_outputs = rnn.apply(embedding)
 
 print("rnn_outputs shape", np.shape(rnn_outputs).tag.test_value)
 pre_softmax = gather.apply(rnn_outputs)
