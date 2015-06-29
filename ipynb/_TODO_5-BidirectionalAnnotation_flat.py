@@ -206,3 +206,6 @@ if False:
   cost.name = "sequence_log_likelihood"
   model=Model(cost)
 
+
+print("TODO :: masks for input layer")
+print("TODO :: text reader from CoNLL")
