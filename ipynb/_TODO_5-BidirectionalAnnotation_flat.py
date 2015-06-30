@@ -38,19 +38,6 @@ mini_batch_size = 128
 batch_of_sentences = (mini_batch_size, max_sentence_length)
 
 """
-Cost functions that respect masks for variable-length input (produced with Padding)
-
-https://groups.google.com/forum/#!topic/blocks-users/O-S45G6tpNY
-Including target sequence mask in cost function for recurrent network
-
-https://github.com/mila-udem/blocks/issues/653
-Cost for recurrent networks
-
-See mask reshape/multiplication for costs somewhere near :
-https://github.com/mila-udem/blocks/blob/master/blocks/bricks/sequence_generators.py#L277
-"""
-
-"""
 Deep BiRNN for Blocks
 
 https://gist.github.com/rizar/183620f9cfec98f2acd4
@@ -303,7 +290,22 @@ numpy < 1.8 instead.
 [2] https://mail.python.org/pipermail/cython-devel/2012-January/001848.html 
 """
 
-print("TODO :: masks for input layer")
+#print("TODO :: masks for input layer")
+"""
+Cost functions that respect masks for variable-length input (produced with Padding)
+
+https://groups.google.com/forum/#!topic/blocks-users/O-S45G6tpNY
+Including target sequence mask in cost function for recurrent network
+
+https://github.com/mila-udem/blocks/issues/653
+Cost for recurrent networks
+
+See mask reshape/multiplication for costs somewhere near :
+https://github.com/mila-udem/blocks/blob/master/blocks/bricks/sequence_generators.py#L277
+"""
 
 print("TODO :: text reader from CoNLL")
-
+"""
+This can be simplified, assuming --docstart-- is a one-word sentence with label 'O'
+Should add it to vocab (? maybe <UNK> for one word is good enough)
+"""
