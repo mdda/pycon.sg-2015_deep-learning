@@ -35,7 +35,7 @@ mini_batch_size = 128
 # This becomes the size of the RNN 'output', 
 # each place with a (hidden_dim*2) vector (x2 because it's bidirectional)
 
-batch_of_sentences = (max_sentence_length, mini_batch_size)
+batch_of_sentences = (mini_batch_size, max_sentence_length)
 
 """
 Cost functions that respect masks for variable-length input (produced with Padding)
@@ -239,6 +239,35 @@ Traceback (most recent call last):
 IndexError: tuple index out of range
 
 
+"""
+
+"""
+Warning :: RuntimeWarning: numpy.ndarray size changed
+=> try ::
+theano-cache clear 
+
+python >>>
+np.version.version
+'1.9.2'
+np.__file__ 
+'/usr/lib64/python2.7/site-packages/numpy/__init__.pyc'
+
+rpm -qa | grep numpy
+numpy-1.9.2-1.fc22.x86_64
+
+
+https://groups.google.com/forum/#!topic/theano-users/A__NVIBYMxA ::
+
+OK, so this is actually due to the new array interface of numpy 1.8 
+interacting with Cython. According to [1] and [2], it is harmless. 
+
+One of these posts suggests recompiling the Cython code to get rid of 
+the warning, but I'm not sure if it would actually help, and it could 
+make the warning appear on the majority of installations with 
+numpy < 1.8 instead. 
+
+[1] http://mail.scipy.org/pipermail/numpy-discussion/2012-April/061741.html 
+[2] https://mail.python.org/pipermail/cython-devel/2012-January/001848.html 
 """
 
 print("TODO :: masks for input layer")
