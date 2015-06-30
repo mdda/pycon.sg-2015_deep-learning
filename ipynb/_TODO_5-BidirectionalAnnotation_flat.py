@@ -144,12 +144,12 @@ raw_labels = gather.apply(rnn_outputs_reshaped)  # This is pre-softmaxing
 print("raw_labels shape", np.shape(raw_labels).tag.test_value)
 #('raw_labels shape', array([ 29*128,  10]))
 
-y_hat = p_labels.apply(raw_labels)
+y_hat = p_labels.apply(raw_labels)  # This is a list of label probabilities
 
 print("y_hat shape", np.shape(y_hat).tag.test_value)
 #('y_hat shape', array([3712,   10]))  # -- so this is an in-place rescaling
 
-y = tensor.lmatrix('targets')
+y = tensor.lmatrix('targets')          # This is a symbolic vector of ints (implies one-hot in categorical_crossentropy)
 y.tag.test_value = np.random.randint( vocab_size, size=batch_of_sentences )
 
 print("y shape", y.shape.tag.test_value)
