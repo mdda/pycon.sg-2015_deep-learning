@@ -87,7 +87,7 @@ rnn = Bidirectional(
   ),
 )
 
-### But will need to reshape the rnn outputs to produce suitable input here...
+### Will need to reshape the rnn outputs to produce suitable input here...
 gather = Linear(name='hidden_to_output', 
   input_dim=hidden_dim*2, output_dim=labels_size,
   weights_init=IsotropicGaussian(0.01),
@@ -98,7 +98,7 @@ p_labels = Softmax()
 
 
 
-## Let's initialize some stuff
+## Let's initialize the variables
 lookup.allocate()
 print("lookup.params=", lookup.params)
 
@@ -121,39 +121,30 @@ x_mask.tag.test_value = np.random.choice( [0.0, 1.0], size=batch_of_sentences ).
 #tensor.reshape(x, batch_of_sentences  )
 #x = tensor.specify_shape(x_base, batch_of_sentences)
 #print("x (new) shape", x.shape.eval())
-
-print("x (new) shape", x.shape.tag.test_value)
+print("x (new) shape", x.shape.tag.test_value)                          # array([128,  29]))
 
 embedding = lookup.apply(x)
 
 rnn_outputs = rnn.apply(embedding, mask=x_mask)
-
-print("rnn_outputs shape", np.shape(rnn_outputs).tag.test_value)
-#('rnn_outputs shape', array([ 29, 128,  80]))
+print("rnn_outputs shape", rnn_outputs.shape.tag.test_value)            # array([ 29, 128,  80]))
 
 ### So : Need to reshape the rnn outputs to produce suitable input here...
 # Convert a tensor here into a long stream of vectors
 
 rnn_outputs_reshaped = rnn_outputs.reshape( (max_sentence_length*mini_batch_size, hidden_dim*2) )
-
-print("rnn_outputs_reshaped shape", np.shape(rnn_outputs_reshaped).tag.test_value)
-#('rnn_outputs_reshaped shape', array([3712,   80]))
+print("rnn_outputs_reshaped shape", rnn_outputs_reshaped.shape.tag.test_value)   #array([3712,   80]))
 
 raw_labels = gather.apply(rnn_outputs_reshaped)  # This is pre-softmaxing
+print("raw_labels shape", raw_labels.shape.tag.test_value)              # array([ 29*128,  10]))
 
-print("raw_labels shape", np.shape(raw_labels).tag.test_value)
-#('raw_labels shape', array([ 29*128,  10]))
+y_hat = p_labels.apply(raw_labels)               # This is a list of label probabilities
+print("y_hat shape", y_hat.shape.tag.test_value)                        # array([3712,   10]))            
+# -- so :: this is an in-place rescaling
 
-y_hat = p_labels.apply(raw_labels)  # This is a list of label probabilities
-
-print("y_hat shape", np.shape(y_hat).tag.test_value)
-#('y_hat shape', array([3712,   10]))  # -- so this is an in-place rescaling
-
-y = tensor.lmatrix('targets')          # This is a symbolic vector of ints (implies one-hot in categorical_crossentropy)
+y = tensor.lmatrix('targets')                    # This is a symbolic vector of ints (implies one-hot in categorical_crossentropy)
 y.tag.test_value = np.random.randint( vocab_size, size=batch_of_sentences )
 
-print("y shape", y.shape.tag.test_value)
-# ('y shape', array([ 29, 128]))
+print("y shape", y.shape.tag.test_value)                                # array([ 29, 128]))
 
 """
 class CategoricalCrossEntropy(Cost):
@@ -167,7 +158,7 @@ class CategoricalCrossEntropy(Cost):
 ## Version with mask : 
 cce = tensor.nnet.categorical_crossentropy(y_hat, y.flatten())
 y_mask = x_mask.flatten()
-cost = (cce * y_mask) / y_mask.sum()  # elementwise multiple, followed by scaling 
+cost = (cce * y_mask) / y_mask.sum()             # elementwise multiple, followed by scaling 
 
 
 ## Less explicit version
@@ -188,22 +179,15 @@ cost = (cce * y_mask) / y_mask.sum()  # elementwise multiple, followed by scalin
 # Alternatively, during test-time
 
 labels_list = raw_labels.argmax(axis=1)
-
-print("labels_list shape", np.shape(labels_list).tag.test_value)
-#('labels_list shape', array([3712]))
+print("labels_list shape", labels_list.shape.tag.test_value)            # array([3712]))
 
 labels = labels_list.reshape( batch_of_sentences )
-
-print("labels shape", np.shape(labels).tag.test_value)
-#('labels shape', array([ 29, 128]))
-
+print("labels shape", labels.shape.tag.test_value)                      # array([ 29, 128]))
 
 
 
 ## Debugging computation overall :
-
 cg = ComputationGraph([cost])
-
 
 if False:
   #print(cg.variables)
