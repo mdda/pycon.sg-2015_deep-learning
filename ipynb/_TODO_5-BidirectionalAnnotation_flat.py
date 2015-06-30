@@ -207,5 +207,39 @@ if False:
   model=Model(cost)
 
 
+print("TODO :: check on expected input format")
+
+
+"""
+. env/bin/activate
+export FUEL_DATA_PATH=~/.fuel
+mkdir  ~/.fuel
+cd  ~/.fuel
+fuel-download mnist
+fuel-convert mnist
+fuel-download mnist --clear
+fuel-info mnist.hdf5
+
+python >>>
+from fuel.datasets import MNIST
+fuel.config.data_path
+mnist = MNIST( u'train' )  # Differs from instructions
+
+s = DataStream.default_stream( mnist, iteration_scheme=ShuffledScheme(mnist.num_examples, 512))
+epoch = s.get_epoch_iterator()
+e = next(epoch)
+
+>>> e[0].shape
+(512, 1, 28, 28)
+>>> e[1].shape
+(512, 1)
+>>> e[2].shape
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+IndexError: tuple index out of range
+
+
+"""
+
 print("TODO :: masks for input layer")
 print("TODO :: text reader from CoNLL")
