@@ -168,7 +168,20 @@ y.tag.test_value = np.random.randint( vocab_size, size=batch_of_sentences )
 print("y shape", y.shape.tag.test_value)
 # ('y shape', array([ 29, 128]))
 
-cost = CategoricalCrossEntropy().apply(y.flatten(), y_hat)
+"""
+class CategoricalCrossEntropy(Cost):
+    @application(outputs=["cost"])
+    def apply(self, y, y_hat):
+        cost = tensor.nnet.categorical_crossentropy(y_hat, y).mean()
+        return cost
+"""
+#cost = CategoricalCrossEntropy().apply(y.flatten(), y_hat)
+
+## Version with mask : 
+cce = tensor.nnet.categorical_crossentropy(y_hat, y.flatten())
+y_mask = x_mask.flatten()
+cost = (cce * y_mask) / y_mask.sum()  # elementwise multiple, followed by scaling 
+
 
 ## Less explicit version
 #mlp = MLP([Softmax()], [hidden_dim, labels_size],
@@ -197,33 +210,37 @@ labels = labels_list.reshape( batch_of_sentences )
 print("labels shape", np.shape(labels).tag.test_value)
 #('labels shape', array([ 29, 128]))
 
+
+
+
+## Debugging computation overall :
+
 cg = ComputationGraph([cost])
 
 
-#print(cg.variables)
-#print( VariableFilter(roles=[OUTPUT])(cg.variables) )
-
-#dir(cg.outputs)
-#np.shape(cg.outputs)
-
-#mlp = MLP([Softmax()], [embedding_dim*2, labels_size],
-#          weights_init=IsotropicGaussian(0.01),
-#          biases_init=Constant(0))
-#mlp.initialize()
-
-#fork = Fork([name for name in encoder.prototype.apply.sequences if name != 'mask'])
-#fork.input_dim = dimension
-#fork.output_dims = [dimension for name in fork.input_names]
-#print(fork.output_dims)
-
 if False:
+  #print(cg.variables)
+  #print( VariableFilter(roles=[OUTPUT])(cg.variables) )
+
+  #dir(cg.outputs)
+  #np.shape(cg.outputs)
+
+  #mlp = MLP([Softmax()], [embedding_dim*2, labels_size],
+  #          weights_init=IsotropicGaussian(0.01),
+  #          biases_init=Constant(0))
+  #mlp.initialize()
+
+  #fork = Fork([name for name in encoder.prototype.apply.sequences if name != 'mask'])
+  #fork.input_dim = dimension
+  #fork.output_dims = [dimension for name in fork.input_names]
+  #print(fork.output_dims)
+
   cost = aggregation.mean(generator.cost_matrix(x[:, :]).sum(), x.shape[1])
   cost.name = "sequence_log_likelihood"
   model=Model(cost)
 
 
 #print("TODO :: check on expected input format")
-
 """
 . env/bin/activate
 export FUEL_DATA_PATH=~/.fuel
