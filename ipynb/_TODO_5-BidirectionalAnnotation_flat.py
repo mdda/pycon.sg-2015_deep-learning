@@ -17,7 +17,7 @@ from blocks.graph import ComputationGraph
 from blocks.filter import VariableFilter
 from blocks.roles import INPUT, WEIGHT, OUTPUT
 
-theano.config.floatX = 'float32'
+floatX = theano.config.floatX = 'float32'
 # theano.config.assert_no_cpu_op='raise'
 
 theano.config.compute_test_value = 'raise'
@@ -85,12 +85,21 @@ Comments indicate that a reshaping has to be done, so let's think
 about sizes of the arrays...
 """
 
-x = tensor.lmatrix('data')
+x = tensor.lmatrix('sentences')
+
+x_mask = tensor.matrix('sentences_mask', dtype=floatX)
+#rnn.apply(inputs=input_to_hidden.apply(x), mask=x_mask)
 
 lookup = LookupTable(vocab_size, embedding_dim)
 #?? lookup.print_shapes=True
 
-rnn = Bidirectional(SimpleRecurrent(dim=hidden_dim, activation=Tanh()))
+rnn = Bidirectional(
+  SimpleRecurrent(dim=hidden_dim, activation=Tanh(),
+    weights_init=IsotropicGaussian(0.01),
+    biases_init=Constant(0),
+  ),
+#  mask=x_mask
+)
 
 ### But will need to reshape the rnn outputs to produce suitable input here...
 gather = Linear(name='hidden_to_output', 
@@ -99,7 +108,6 @@ gather = Linear(name='hidden_to_output',
   biases_init=Constant(0)
 )
 
-### But will need to reshape the rnn outputs to produce suitable input here...
 p_labels = Softmax()
 
 
@@ -134,9 +142,7 @@ rnn_outputs = rnn.apply(embedding)
 print("rnn_outputs shape", np.shape(rnn_outputs).tag.test_value)
 #('rnn_outputs shape', array([ 29, 128,  80]))
 
-
-### But will need to reshape the rnn outputs to produce suitable input here...
-
+### So : Need to reshape the rnn outputs to produce suitable input here...
 rnn_outputs_reshaped = rnn_outputs.reshape( (max_sentence_length*mini_batch_size, hidden_dim*2) )
 #rnn_outputs_reshaped = rnn_outputs
 
@@ -207,8 +213,7 @@ if False:
   model=Model(cost)
 
 
-print("TODO :: check on expected input format")
-
+#print("TODO :: check on expected input format")
 
 """
 . env/bin/activate
@@ -230,17 +235,19 @@ epoch = s.get_epoch_iterator()
 e = next(epoch)
 
 >>> e[0].shape
-(512, 1, 28, 28)
->>> e[1].shape
-(512, 1)
+(512, 1, 28, 28)  #So these are the examples, each image being the 1 element of the 2nd index
+
+>>> e[1].shape 
+(512, 1)          #So these are the labels
+
 >>> e[2].shape
 Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
 IndexError: tuple index out of range
 
-
 """
 
+#print("TODO :: Find out about numpy.ndarray size changed warning")
 """
 Warning :: RuntimeWarning: numpy.ndarray size changed
 => try ::
@@ -271,4 +278,6 @@ numpy < 1.8 instead.
 """
 
 print("TODO :: masks for input layer")
+
 print("TODO :: text reader from CoNLL")
+
