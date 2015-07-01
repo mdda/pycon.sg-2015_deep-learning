@@ -17,9 +17,11 @@ dnf install scipy numpy python-pandas Cython
 (and, since it's so handy):
 
 ```
-dnf install python-ipython-notebook pydot
+dnf install pydot
 ```
 
+Note that installing ``python-ipython-notebook`` system-wide doesn't seem to work well,
+because there is a version conflict involving ``tornado``. 
 
 Then, as usual (but making use of these system-site-packages) :
 

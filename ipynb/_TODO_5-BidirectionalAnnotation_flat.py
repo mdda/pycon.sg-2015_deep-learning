@@ -67,6 +67,40 @@ https://github.com/sotelo/poet/blob/master/poet.py
          
 """
 
+#from fuel.datasets import Dataset
+from fuel.streams import DataStream
+from fuel.schemes import ConstantScheme
+
+from fuel.datasets import Dataset
+
+class CharacterTextFile(Dataset):
+    provides_sources = ("data",)
+
+    def __init__(self, fname, chunk_len, dictionary, **kwargs):
+        self.fname = fname
+        self.chunk_len = chunk_len
+        self.dictionary = dictionary 
+        super(CharacterTextFile, self).__init__(**kwargs)
+
+    def open(self):
+        return open(self.fname,'r')
+
+    def get_data(self, state, request):
+        assert isinstance(request, int)
+        x = numpy.zeros((self.chunk_len, request), dtype='int64')
+        for i in range(request):
+            txt=state.read(self.chunk_len)
+            if len(txt)<self.chunk_len: raise StopIteration
+            #print(">%s<\n" % (txt,))
+            x[:, i] = [ self.dictionary[c] for c in txt ]
+        return (x,)    
+    
+    def close(self, state):
+        state.close()
+        
+dataset = CharacterTextFile(data_path, chunk_len=seq_len, dictionary=char2code)
+data_stream = DataStream(dataset, iteration_scheme=ConstantScheme(batch_size))
+
 """
 Comments indicate that a reshaping has to be done, so let's think 
 about sizes of the arrays...
