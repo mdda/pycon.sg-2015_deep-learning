@@ -69,6 +69,8 @@ https://github.com/sotelo/poet/blob/master/poet.py
 import codecs
 import re
 
+from picklable_itertools import iter_, chain
+
 from fuel.datasets import Dataset
 from fuel.transformers import Mapping, Batch, Padding, Filter
 from fuel.streams import DataStream
@@ -96,15 +98,16 @@ class CoNLLTextFile(Dataset):
     _digits = re.compile('\d')
     unknown = None
 
-    def __init__(self, fname, dictionary, **kwargs):
-        self.fname = fname
+    def __init__(self, files, dictionary, **kwargs):
+        self.files = files
         self.dictionary = dictionary 
         self.unknown = len(self.dictionary)  # Assume <UNK> is the last (?) entry in dictionary??
         
         super(CoNLLTextFile, self).__init__(**kwargs)
 
     def open(self):
-        return codecs.open(self.fname, encoding="latin1")
+        return chain(*[iter_(codecs.open(f, encoding="latin1")) for f in self.files])
+        #return codecs.open(self.fname, encoding="latin1")
         
     def get_data(self, state, request=None):
         if request is not None:
@@ -146,13 +149,9 @@ code2word = word2vec['vocab']
 word2code = {  v:i for i,v in enumerate(code2word) }
 
 data_path = '/home/andrewsm/SEER/external/CoNLL2003/ner/eng.train'  # 3.3Mb file
-data_stream = CoNLLTextFile(data_path, dictionary=word2code)
+dataset = CoNLLTextFile(data_path, dictionary=word2code)
 
-a=data_stream.get_data(10)
-
-exit(0)
-
-#data_stream = dataset.get_example_stream()
+data_stream = DataStream(dataset)
 data_stream = Filter(data_stream, _filter_long)
 #data_stream = Mapping(data_stream, reverse_words, add_sources=("targets",))
 
