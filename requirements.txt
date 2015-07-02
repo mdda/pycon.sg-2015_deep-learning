@@ -30,4 +30,4 @@ pydot
 #gensim
 
 ## This is a hd5 pickler (fast)
-#hickle
+hickle

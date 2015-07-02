@@ -79,7 +79,6 @@ def _filter_long(data):
 def _transpose(data):
     return tuple(array.T for array in data)
 
-
 class CoNLLTextFile(Dataset):
     provides_sources = ("tokens", "extra", "labels", )
     ner=dict(
@@ -125,7 +124,7 @@ class CoNLLTextFile(Dataset):
             token=word.lower()
             caps = 0. if (word == token) else 1.
             
-            if bool(_digits.search(token)):
+            if bool(self._digits.search(token)):
                 #print("NUMBER found in %s" % (token))
                 token = re.sub(r'\d+', 'NUMBER', token)
             
@@ -138,9 +137,15 @@ class CoNLLTextFile(Dataset):
     
     def close(self, state):
         state.close()
-        
+
+import hickle
+word2vec = hickle.load('/home/andrewsm/SEER/services/deepner/server/data/embedding.0.hickle')
+#embedding_array = word2vec.embedding
+code2word = word2vec.vocab 
+word2code = {  v:i for i,v in enumerate(code2word) }
+
 data_path = '/home/andrewsm/SEER/external/CoNLL2003/ner/eng.train'
-dataset = CoNLLTextFile(data_path, dictionary=dictionary)
+dataset = CoNLLTextFile(data_path, dictionary=word2code)
 
 data_stream = DataStream(dataset, iteration_scheme=ConstantScheme(batch_size))
 
