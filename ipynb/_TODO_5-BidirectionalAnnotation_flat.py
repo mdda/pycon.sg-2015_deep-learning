@@ -126,7 +126,7 @@ class CoNLLTextFile(Dataset):
                 word = line
             
             token=word.lower()
-            caps = 0. if (word == token) else 1.
+            caps = 0. if word == token else 1.
             
             if bool(self._digits.search(token)):
                 #print("NUMBER found in %s" % (token))
@@ -135,9 +135,9 @@ class CoNLLTextFile(Dataset):
             tokens.append( self.dictionary.get(token, self.unknown) )
             
             spelling_ner = []
-            extras.append( [caps].extend(spelling_ner) )  # include spelling-related NER vector
+            extras.append( [ caps, ] + spelling_ner )  # include spelling-related NER vector
             
-        return (tokens, extras, labels)   
+        return (np.array(tokens, dtype="int32"), np.array(extras, dtype=floatX), np.array(labels, dtype="int8"))   
     
     def close(self, state):
         state.close()
@@ -155,10 +155,9 @@ data_stream = DataStream(dataset)
 data_stream = Filter(data_stream, _filter_long)
 #data_stream = Mapping(data_stream, reverse_words, add_sources=("targets",))
 
-#data_stream = Batch(data_stream, iteration_scheme=ConstantScheme(10))
-data_stream = Batch(data_stream, iteration_scheme=ConstantScheme(5))
+data_stream = Batch(data_stream, iteration_scheme=ConstantScheme(2))
 
-data_stream = Padding(data_stream)
+#data_stream = Padding(data_stream)
 #data_stream = Mapping(data_stream, _transpose)
 
 for data in data_stream.get_epoch_iterator():
