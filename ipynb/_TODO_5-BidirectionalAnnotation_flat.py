@@ -69,10 +69,10 @@ https://github.com/sotelo/poet/blob/master/poet.py
 import codecs
 import re
 
+from fuel.datasets import Dataset
+from fuel.transformers import Mapping, Batch, Padding, Filter
 from fuel.streams import DataStream
 from fuel.schemes import ConstantScheme
-
-from fuel.datasets import Dataset
 
 def _filter_long(data):
     return len(data[0]) <= max_sentence_length
@@ -141,20 +141,20 @@ class CoNLLTextFile(Dataset):
 
 import hickle
 word2vec = hickle.load('/home/andrewsm/SEER/services/deepner/server/data/embedding.0.hickle')
-#embedding_array = word2vec.embedding
-code2word = word2vec.vocab 
+embedding = word2vec['embedding']
+code2word = word2vec['vocab']
 word2code = {  v:i for i,v in enumerate(code2word) }
 
 data_path = '/home/andrewsm/SEER/external/CoNLL2003/ner/eng.train'
-dataset = CoNLLTextFile(data_path, dictionary=word2code)
+data_stream = CoNLLTextFile(data_path, dictionary=word2code)
 
-data_stream = DataStream(dataset, iteration_scheme=ConstantScheme(batch_size))
-
-data_stream = dataset.get_example_stream()
+#data_stream = dataset.get_example_stream()
 data_stream = Filter(data_stream, _filter_long)
 #data_stream = Mapping(data_stream, reverse_words, add_sources=("targets",))
+
 #data_stream = Batch(data_stream, iteration_scheme=ConstantScheme(10))
 data_stream = Batch(data_stream, iteration_scheme=ConstantScheme(5))
+
 data_stream = Padding(data_stream)
 #data_stream = Mapping(data_stream, _transpose)
 
