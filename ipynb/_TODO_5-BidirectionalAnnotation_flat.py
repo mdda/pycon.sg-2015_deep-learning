@@ -85,7 +85,7 @@ def _transpose(data):
 class CoNLLTextFile(Dataset):
     provides_sources = ("tokens", "extra", "labels", )
     ner={
-      '0'     :(0, 0), 
+      'O'     :(0, 0), 
       'I-PER' :(0, 1), 
       'I-LOC' :(0, 2), 
       'I-ORG' :(0, 3), 
@@ -106,21 +106,21 @@ class CoNLLTextFile(Dataset):
         super(CoNLLTextFile, self).__init__(**kwargs)
 
     def open(self):
-        return chain(*[iter_(codecs.open(f, encoding="latin1")) for f in self.files])
+        return chain(*[iter_( codecs.open(f, encoding="latin1") ) for f in self.files])
         #return codecs.open(self.fname, encoding="latin1")
         
     def get_data(self, state, request=None):
         if request is not None:
             raise ValueError
-        tokens, extra, labels = [], [], []
+        tokens, extras, labels = [], [], []
         while True:
             # 'state' is the open file, read entries until we hit a ''
-            line = next(state)
+            line = next(state).rstrip()
             if len(line)==0:
                 break
             if ' ' in line:
                 l = line.split(' ')
-                labels.append(this.ner[ l[-1] ][1] ) # Just the second entry...
+                labels.append(self.ner[ l[-1] ][1] ) # Just the second entry...
                 word = l[0]
             else: 
                 word = line
@@ -148,8 +148,8 @@ embedding = word2vec['embedding']
 code2word = word2vec['vocab']
 word2code = {  v:i for i,v in enumerate(code2word) }
 
-data_path = '/home/andrewsm/SEER/external/CoNLL2003/ner/eng.train'  # 3.3Mb file
-dataset = CoNLLTextFile(data_path, dictionary=word2code)
+data_paths = ['/home/andrewsm/SEER/external/CoNLL2003/ner/eng.train',]  # 3.3Mb file
+dataset = CoNLLTextFile(data_paths, dictionary=word2code)
 
 data_stream = DataStream(dataset)
 data_stream = Filter(data_stream, _filter_long)
