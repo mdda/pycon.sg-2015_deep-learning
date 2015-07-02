@@ -145,8 +145,12 @@ embedding = word2vec['embedding']
 code2word = word2vec['vocab']
 word2code = {  v:i for i,v in enumerate(code2word) }
 
-data_path = '/home/andrewsm/SEER/external/CoNLL2003/ner/eng.train'
+data_path = '/home/andrewsm/SEER/external/CoNLL2003/ner/eng.train'  # 3.3Mb file
 data_stream = CoNLLTextFile(data_path, dictionary=word2code)
+
+a=data_stream.get_data(10)
+
+exit(0)
 
 #data_stream = dataset.get_example_stream()
 data_stream = Filter(data_stream, _filter_long)
@@ -158,6 +162,9 @@ data_stream = Batch(data_stream, iteration_scheme=ConstantScheme(5))
 data_stream = Padding(data_stream)
 #data_stream = Mapping(data_stream, _transpose)
 
+for data in data_stream.get_epoch_iterator():
+    print(data)
+    break
 
 exit(0)
 """
