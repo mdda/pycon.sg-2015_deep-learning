@@ -66,41 +66,94 @@ Usage of RecurrentStack :
 https://github.com/sotelo/poet/blob/master/poet.py
          
 """
+import codecs
 
-#from fuel.datasets import Dataset
 from fuel.streams import DataStream
 from fuel.schemes import ConstantScheme
 
 from fuel.datasets import Dataset
 
-class CharacterTextFile(Dataset):
-    provides_sources = ("data",)
+def _filter_long(data):
+    return len(data[0]) <= max_sentence_length
 
-    def __init__(self, fname, chunk_len, dictionary, **kwargs):
+def _transpose(data):
+    return tuple(array.T for array in data)
+
+
+class CoNLLTextFile(Dataset):
+    provides_sources = ("tokens", "extra", "labels", )
+    ner=dict(
+      '0'     :(0, 0), 
+      'I-PER' :(0, 1), 
+      'I-LOC' :(0, 2), 
+      'I-ORG' :(0, 3), 
+      'I-MISC':(0, 4), 
+      'B-PER' :(1, 1), 
+      'B-LOC' :(1, 2), 
+      'B-ORG' :(1, 3), 
+      'B-MISC':(1, 4), 
+    )
+    _digits = re.compile('\d')
+    unknown = None
+
+    def __init__(self, fname, dictionary, **kwargs):
         self.fname = fname
-        self.chunk_len = chunk_len
         self.dictionary = dictionary 
-        super(CharacterTextFile, self).__init__(**kwargs)
+        self.unknown = len(self.dictionary)  # Assume <UNK> is the last (?) entry in dictionary??
+        
+        super(CoNLLTextFile, self).__init__(**kwargs)
 
     def open(self):
-        return open(self.fname,'r')
-
-    def get_data(self, state, request):
-        assert isinstance(request, int)
-        x = numpy.zeros((self.chunk_len, request), dtype='int64')
-        for i in range(request):
-            txt=state.read(self.chunk_len)
-            if len(txt)<self.chunk_len: raise StopIteration
-            #print(">%s<\n" % (txt,))
-            x[:, i] = [ self.dictionary[c] for c in txt ]
-        return (x,)    
+        return codecs.open(self.fname, encoding="latin1")
+        
+    def get_data(self, state, request=None):
+        if request is not None:
+            raise ValueError
+        tokens, extra, labels = [], [], []
+        while True:
+            # 'state' is the open file, read entries until we hit a ''
+            line = next(state)
+            if len(line)==0:
+                break
+            if ' ' in line:
+                l = line.split(' ')
+                labels.append(this.ner[ l[-1] ][1] ) # Just the second entry...
+                word = l[0]
+            else: 
+                word = line
+            
+            token=word.lower()
+            caps = 0. if (word == token) else 1.
+            
+            if bool(_digits.search(token)):
+                #print("NUMBER found in %s" % (token))
+                token = re.sub(r'\d+', 'NUMBER', token)
+            
+            tokens.append( self.dictionary.get(token, self.unknown) )
+            
+            spelling_ner = []
+            extras.append( (caps, *spelling_ner) )  # include spelling-related NER vector
+            
+        return (tokens, extras, labels)   
     
     def close(self, state):
         state.close()
         
-dataset = CharacterTextFile(data_path, chunk_len=seq_len, dictionary=char2code)
+data_path = '/home/andrewsm/SEER/external/CoNLL2003/ner/eng.train'
+dataset = CoNLLTextFile(data_path, dictionary=dictionary)
+
 data_stream = DataStream(dataset, iteration_scheme=ConstantScheme(batch_size))
 
+data_stream = dataset.get_example_stream()
+data_stream = Filter(data_stream, _filter_long)
+#data_stream = Mapping(data_stream, reverse_words, add_sources=("targets",))
+#data_stream = Batch(data_stream, iteration_scheme=ConstantScheme(10))
+data_stream = Batch(data_stream, iteration_scheme=ConstantScheme(5))
+data_stream = Padding(data_stream)
+#data_stream = Mapping(data_stream, _transpose)
+
+
+exit(0)
 """
 Comments indicate that a reshaping has to be done, so let's think 
 about sizes of the arrays...
