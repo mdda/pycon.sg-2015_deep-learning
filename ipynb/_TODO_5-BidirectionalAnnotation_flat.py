@@ -67,6 +67,7 @@ https://github.com/sotelo/poet/blob/master/poet.py
          
 """
 import codecs
+import re
 
 from fuel.streams import DataStream
 from fuel.schemes import ConstantScheme
@@ -81,7 +82,7 @@ def _transpose(data):
 
 class CoNLLTextFile(Dataset):
     provides_sources = ("tokens", "extra", "labels", )
-    ner=dict(
+    ner={
       '0'     :(0, 0), 
       'I-PER' :(0, 1), 
       'I-LOC' :(0, 2), 
@@ -91,7 +92,7 @@ class CoNLLTextFile(Dataset):
       'B-LOC' :(1, 2), 
       'B-ORG' :(1, 3), 
       'B-MISC':(1, 4), 
-    )
+    }
     _digits = re.compile('\d')
     unknown = None
 
@@ -131,7 +132,7 @@ class CoNLLTextFile(Dataset):
             tokens.append( self.dictionary.get(token, self.unknown) )
             
             spelling_ner = []
-            extras.append( (caps, *spelling_ner) )  # include spelling-related NER vector
+            extras.append( [caps].extend(spelling_ner) )  # include spelling-related NER vector
             
         return (tokens, extras, labels)   
     
