@@ -41,11 +41,12 @@ hidden_dim=embedding_dim  # This seems to be the expectation
 labels_size=5 # ( 0 .. 4 inclusive ), see range of CoNLLTextFile.ner values
 
 max_sentence_length = 29
-mini_batch_size = 128
+mini_batch_size = 16
 # This becomes the size of the RNN 'output', 
 # each place with a (hidden_dim*2) vector (x2 because it's bidirectional)
 
-batch_of_sentences = (mini_batch_size, max_sentence_length)
+#batch_of_sentences = (mini_batch_size, max_sentence_length)
+batch_of_sentences = (max_sentence_length, mini_batch_size)  # Since the data_stream has a _transpose
 
 """
 Deep BiRNN for Blocks
@@ -237,15 +238,15 @@ print("rnn_outputs shape", rnn_outputs.shape.tag.test_value)            # array(
 rnn_outputs_reshaped = rnn_outputs.reshape( (max_sentence_length*mini_batch_size, hidden_dim*2) )
 print("rnn_outputs_reshaped shape", rnn_outputs_reshaped.shape.tag.test_value)   #array([3712,   80]))
 
-raw_labels = gather.apply(rnn_outputs_reshaped)  # This is pre-softmaxing
-print("raw_labels shape", raw_labels.shape.tag.test_value)              # array([ 29*128,  10]))
+labels_raw = gather.apply(rnn_outputs_reshaped)  # This is pre-softmaxing
+print("labels_raw shape", labels_raw.shape.tag.test_value)              # array([ 29*128,  10]))
 
-y_hat = p_labels.apply(raw_labels)               # This is a list of label probabilities
-print("y_hat shape", y_hat.shape.tag.test_value)                        # array([3712,   10]))            
+label_probs = p_labels.apply(labels_raw)               # This is a list of label probabilities
+print("label_probs shape", label_probs.shape.tag.test_value)            # array([3712,   10]))            
 # -- so :: this is an in-place rescaling
 
 y = tensor.lmatrix('targets')                    # This is a symbolic vector of ints (implies one-hot in categorical_crossentropy)
-y.tag.test_value = np.random.randint( vocab_size, size=batch_of_sentences )
+y.tag.test_value = np.random.randint( labels_size, size=batch_of_sentences )
 
 print("y shape", y.shape.tag.test_value)                                # array([ 29, 128]))
 
@@ -256,10 +257,10 @@ class CategoricalCrossEntropy(Cost):
         cost = tensor.nnet.categorical_crossentropy(y_hat, y).mean()
         return cost
 """
-#cost = CategoricalCrossEntropy().apply(y.flatten(), y_hat)
+#cost = CategoricalCrossEntropy().apply(y.flatten(), label_probs)
 
 ## Version with mask : 
-cce = tensor.nnet.categorical_crossentropy(y_hat, y.flatten())
+cce = tensor.nnet.categorical_crossentropy(label_probs, y.flatten())
 y_mask = x_mask.flatten()
 cost = (cce * y_mask) / y_mask.sum()             # elementwise multiple, followed by scaling 
 
@@ -281,10 +282,10 @@ cost = (cce * y_mask) / y_mask.sum()             # elementwise multiple, followe
 
 # Alternatively, during test-time
 
-labels_list = raw_labels.argmax(axis=1)
-print("labels_list shape", labels_list.shape.tag.test_value)            # array([3712]))
+labels_out = labels_raw.argmax(axis=1)
+print("labels_out shape", labels_out.shape.tag.test_value)              # array([3712]))
 
-labels = labels_list.reshape( batch_of_sentences )
+labels = labels_out.reshape( batch_of_sentences )
 print("labels shape", labels.shape.tag.test_value)                      # array([ 29, 128]))
 
 
