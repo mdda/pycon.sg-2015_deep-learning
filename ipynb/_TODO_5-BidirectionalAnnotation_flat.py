@@ -114,7 +114,7 @@ def _transpose(data):
     return tuple(array.T for array in data)
 
 class CoNLLTextFile(Dataset):
-    provides_sources = ("tokens", "extra", "labels", )
+    provides_sources = ("tokens", "extras", "labels", )
     ner={
       'O'     :(0, 0), 
       'I-PER' :(0, 1), 
@@ -273,7 +273,7 @@ label_probs = p_labels.apply(labels_raw)               # This is a list of label
 print("label_probs shape", label_probs.shape.tag.test_value)            # array([ 464, 5]))            
 # -- so :: this is an in-place rescaling
 
-y = tensor.lmatrix('targets')                    # This is a symbolic vector of ints (implies one-hot in categorical_crossentropy)
+y = tensor.lmatrix('labels')                    # This is a symbolic vector of ints (implies one-hot in categorical_crossentropy)
 y.tag.test_value = np.random.randint( labels_size, size=batch_of_sentences )
 
 print("y shape", y.shape.tag.test_value)                                # array([ 29, 16]))
