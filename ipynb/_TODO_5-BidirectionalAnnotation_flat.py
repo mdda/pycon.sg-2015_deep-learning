@@ -22,13 +22,23 @@ floatX = theano.config.floatX = 'float32'
 
 theano.config.compute_test_value = 'raise'
 
-vocab_size=4
-embedding_dim=40
+import hickle
+word2vec = hickle.load('/home/andrewsm/SEER/services/deepner/server/data/embedding.0.hickle')
+embedding = word2vec['embedding']
+code2word = word2vec['vocab']
+word2code = {  v:i for i,v in enumerate(code2word) }
+
+## These are set from the contents of the embedding file itself
+#vocab_size=4
+#embedding_dim=40
+
+print("Embedding shape :", embedding.shape)    # (4347, 100)
+vocab_size, embedding_dim = embedding.shape
 
 #hidden_dim=34  # This is a problem... if it is not the same as the embedding
 hidden_dim=embedding_dim  # This seems to be the expectation
 
-labels_size=10
+labels_size=5 # ( 0 .. 4 inclusive ), see range of CoNLLTextFile.ner values
 
 max_sentence_length = 29
 mini_batch_size = 128
@@ -142,12 +152,6 @@ class CoNLLTextFile(Dataset):
     def close(self, state):
         state.close()
 
-import hickle
-word2vec = hickle.load('/home/andrewsm/SEER/services/deepner/server/data/embedding.0.hickle')
-embedding = word2vec['embedding']
-code2word = word2vec['vocab']
-word2code = {  v:i for i,v in enumerate(code2word) }
-
 data_paths = ['/home/andrewsm/SEER/external/CoNLL2003/ner/eng.train',]  # 3.3Mb file
 dataset = CoNLLTextFile(data_paths, dictionary=word2code)
 
@@ -203,7 +207,8 @@ print("lookup.params=", lookup.params)
 #lookup.weights_init = FUNCTION
 #lookup.initialize() 
 
-lookup.params[0].set_value( np.random.normal( scale = 0.1, size=(vocab_size, embedding_dim) ).astype(np.float32) )
+#lookup.params[0].set_value( np.random.normal( scale = 0.1, size=(vocab_size, embedding_dim) ).astype(np.float32) )
+lookup.params[0].set_value( embedding )
 
 rnn.initialize()
 gather.initialize()
