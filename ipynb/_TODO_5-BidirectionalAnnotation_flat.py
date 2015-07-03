@@ -17,8 +17,14 @@ from blocks.graph import ComputationGraph
 from blocks.filter import VariableFilter
 #from blocks.roles import INPUT, WEIGHT, OUTPUT
 
+from blocks.model import Model
 from blocks.algorithms import (GradientDescent, Scale, StepClipping, CompositeRule)
+from blocks.main_loop import MainLoop
 
+from blocks.extensions import FinishAfter, Printing, Timing
+from blocks.extensions.saveload import Checkpoint
+from blocks.extensions.monitoring import TrainingDataMonitoring
+from blocks.utils import named_copy
 
 floatX = theano.config.floatX = 'float32'
 # theano.config.assert_no_cpu_op='raise'
@@ -55,8 +61,12 @@ mini_batch_size = 16
 # This becomes the size of the RNN 'output', 
 # each place with a (hidden_dim*2) vector (x2 because it's bidirectional)
 
+num_batches=10  # For the whole main_loop
+
 #batch_of_sentences = (mini_batch_size, max_sentence_length)
 batch_of_sentences = (max_sentence_length, mini_batch_size)  # Since the data_stream has a _transpose
+
+checkpoint_save_path='.'
 
 """
 Deep BiRNN for Blocks
@@ -295,11 +305,25 @@ cost = (cce * y_mask).sum() / y_mask.sum()             # elementwise multiple, f
 
 # Define the training algorithm.
 cg = ComputationGraph(cost)
+print("Created ComputationGraph");
+
 algorithm = GradientDescent(
     cost=cost, 
     params=cg.parameters,
-    step_rule=CompositeRule([StepClipping(10.0), Scale(0.01)]),
+    step_rule=CompositeRule( [StepClipping(10.0), Scale(0.01), ] ),
 )
+print("Defined Algorithm");
+
+model = Model(cost)
+print("Defined Model");
+
+obs_max_length = named_copy(x.shape[0], "max_length")
+observables = [
+    cost, 
+    obs_max_length,
+    #min_energy, max_energy, 
+    #mean_activation,
+]
 
 main_loop = MainLoop(
     model=model,
@@ -308,15 +332,17 @@ main_loop = MainLoop(
     extensions=[
         Timing(),
         TrainingDataMonitoring(observables, after_batch=True),
-        average_monitoring,
+        #average_monitoring,
         FinishAfter(after_n_batches=num_batches),
         
         # Saving the model and the log separately is convenient,
         # because loading the whole pickle takes quite some time.
-        Checkpoint(save_path, every_n_batches=500, save_separately=["model", "log"]),
+        Checkpoint(checkpoint_save_path, every_n_batches=500, save_separately=["model", "log"]),
         Printing(every_n_batches=1)
     ]
 )
+print("Defined MainLoop");
+
 main_loop.run()
 
 
