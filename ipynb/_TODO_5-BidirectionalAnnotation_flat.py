@@ -212,7 +212,7 @@ p_labels = Softmax()
 
 ## Let's initialize the variables
 lookup.allocate()
-print("lookup.params=", lookup.params)
+print("lookup.params=", lookup.params)                                  # ('lookup.params=', [W])
 
 #lookup.weights_init = FUNCTION
 #lookup.initialize() 
@@ -235,35 +235,35 @@ x_mask.tag.test_value  = np.random.choice( [0.0, 1.0], size=batch_of_sentences )
 #tensor.reshape(x, batch_of_sentences  )
 #x = tensor.specify_shape(x_base, batch_of_sentences)
 #print("x (new) shape", x.shape.eval())
-print("x (new) shape", x.shape.tag.test_value)                          # array([128,  29]))
+print("x (new) shape", x.shape.tag.test_value)                          # array([29, 16]))
 
 word_embedding = lookup.apply(x)
-print("word_embedding shape", word_embedding.shape.tag.test_value)      # array([ 29, 128,  80]))
-print("x_extra shape", x_extra.shape.tag.test_value)                    # array([ 29, 128,  80]))
+print("word_embedding shape", word_embedding.shape.tag.test_value)      # array([ 29, 16, 100]))
+print("x_extra shape", x_extra.shape.tag.test_value)                    # array([ 29, 16,   1]))
 
 embedding_extended = tensor.concatenate([ word_embedding, x_extra ], axis=-1)
-print("embedding_extended shape", embedding_extended.shape.tag.test_value)   # array([ 29, 128,  80]))
+print("embedding_extended shape", embedding_extended.shape.tag.test_value)   # array([ 29, 16, 101]))
 
 rnn_outputs = rnn.apply(embedding_extended, mask=x_mask)
-print("rnn_outputs shape", rnn_outputs.shape.tag.test_value)            # array([ 29, 128,  80]))
+print("rnn_outputs shape", rnn_outputs.shape.tag.test_value)            # array([ 29, 16, 202]))
 
 ### So : Need to reshape the rnn outputs to produce suitable input here...
 # Convert a tensor here into a long stream of vectors
 
 rnn_outputs_reshaped = rnn_outputs.reshape( (max_sentence_length*mini_batch_size, hidden_dim*2) )
-print("rnn_outputs_reshaped shape", rnn_outputs_reshaped.shape.tag.test_value)   #array([3712,   80]))
+print("rnn_outputs_reshaped shape", rnn_outputs_reshaped.shape.tag.test_value)   #array([464, 202]))
 
 labels_raw = gather.apply(rnn_outputs_reshaped)  # This is pre-softmaxing
-print("labels_raw shape", labels_raw.shape.tag.test_value)              # array([ 29*128,  10]))
+print("labels_raw shape", labels_raw.shape.tag.test_value)              # array([ 464, 5]))
 
 label_probs = p_labels.apply(labels_raw)               # This is a list of label probabilities
-print("label_probs shape", label_probs.shape.tag.test_value)            # array([3712,   10]))            
+print("label_probs shape", label_probs.shape.tag.test_value)            # array([ 464, 5]))            
 # -- so :: this is an in-place rescaling
 
 y = tensor.lmatrix('targets')                    # This is a symbolic vector of ints (implies one-hot in categorical_crossentropy)
 y.tag.test_value = np.random.randint( labels_size, size=batch_of_sentences )
 
-print("y shape", y.shape.tag.test_value)                                # array([ 29, 128]))
+print("y shape", y.shape.tag.test_value)                                # array([ 29, 16]))
 
 """
 class CategoricalCrossEntropy(Cost):
@@ -298,10 +298,10 @@ cost = (cce * y_mask) / y_mask.sum()             # elementwise multiple, followe
 # Alternatively, during test-time
 
 labels_out = labels_raw.argmax(axis=1)
-print("labels_out shape", labels_out.shape.tag.test_value)              # array([3712]))
+print("labels_out shape", labels_out.shape.tag.test_value)              # array([ 464 ]))
 
 labels = labels_out.reshape( batch_of_sentences )
-print("labels shape", labels.shape.tag.test_value)                      # array([ 29, 128]))
+print("labels shape", labels.shape.tag.test_value)                      # array([ 29, 16]))
 
 
 
