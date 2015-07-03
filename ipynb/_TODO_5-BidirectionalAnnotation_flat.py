@@ -41,8 +41,9 @@ word2code = {  v:i for i,v in enumerate(code2word) }
 print("Embedding shape :", embedding.shape)    # (4347, 100)
 vocab_size, embedding_dim = embedding.shape
 
-#hidden_dim=34  # This is a problem... if it is not the same as the embedding
-hidden_dim=embedding_dim  # This seems to be the expectation
+extra_size = 1 # (caps,)
+
+hidden_dim = embedding_dim+extra_size  # RNN units align over total embedding size
 
 labels_size=5 # ( 0 .. 4 inclusive ), see range of CoNLLTextFile.ner values
 
@@ -189,6 +190,8 @@ x_mask = tensor.matrix('tokens_mask', dtype=floatX)
 lookup = LookupTable(vocab_size, embedding_dim)
 #?? lookup.print_shapes=True
 
+x_extra = tensor.matrix('extras', dtype=floatX)
+
 rnn = Bidirectional(
   SimpleRecurrent(dim=hidden_dim, activation=Tanh(),
     weights_init=IsotropicGaussian(0.01),
@@ -233,9 +236,13 @@ x_mask.tag.test_value = np.random.choice( [0.0, 1.0], size=batch_of_sentences ).
 #print("x (new) shape", x.shape.eval())
 print("x (new) shape", x.shape.tag.test_value)                          # array([128,  29]))
 
-embedding = lookup.apply(x)
+word_embedding = lookup.apply(x)
+print("word_embedding shape", word_embedding.shape.tag.test_value)      # array([ 29, 128,  80]))
 
-rnn_outputs = rnn.apply(embedding, mask=x_mask)
+embedding_extended = tensor.concatenate([ embedding_extended, x_extra ], axis=-1)
+print("embedding_extended shape", embedding_extended.shape.tag.test_value)   # array([ 29, 128,  80]))
+
+rnn_outputs = rnn.apply(embedding_extended, mask=x_mask)
 print("rnn_outputs shape", rnn_outputs.shape.tag.test_value)            # array([ 29, 128,  80]))
 
 ### So : Need to reshape the rnn outputs to produce suitable input here...
