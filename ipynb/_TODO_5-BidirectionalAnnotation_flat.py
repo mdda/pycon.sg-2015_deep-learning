@@ -190,7 +190,7 @@ x_mask = tensor.matrix('tokens_mask', dtype=floatX)
 lookup = LookupTable(vocab_size, embedding_dim)
 #?? lookup.print_shapes=True
 
-x_extra = tensor.matrix('extras', dtype=floatX)
+x_extra = tensor.tensor3('extras', dtype=floatX)
 
 rnn = Bidirectional(
   SimpleRecurrent(dim=hidden_dim, activation=Tanh(),
@@ -228,8 +228,9 @@ gather.initialize()
 ## Now for the application of these units
 
 # Define the shape of x specifically...  :: the data has format (batch, features).
-x.tag.test_value      = np.random.randint(vocab_size, size=batch_of_sentences )
-x_mask.tag.test_value = np.random.choice( [0.0, 1.0], size=batch_of_sentences ).astype(np.float32)
+x.tag.test_value       = np.random.randint(vocab_size, size=batch_of_sentences )
+x_extra.tag.test_value = np.zeros( (max_sentence_length, mini_batch_size, 1) ).astype(np.float32)
+x_mask.tag.test_value  = np.random.choice( [0.0, 1.0], size=batch_of_sentences ).astype(np.float32)
 
 #tensor.reshape(x, batch_of_sentences  )
 #x = tensor.specify_shape(x_base, batch_of_sentences)
@@ -238,8 +239,9 @@ print("x (new) shape", x.shape.tag.test_value)                          # array(
 
 word_embedding = lookup.apply(x)
 print("word_embedding shape", word_embedding.shape.tag.test_value)      # array([ 29, 128,  80]))
+print("x_extra shape", x_extra.shape.tag.test_value)                    # array([ 29, 128,  80]))
 
-embedding_extended = tensor.concatenate([ embedding_extended, x_extra ], axis=-1)
+embedding_extended = tensor.concatenate([ word_embedding, x_extra ], axis=-1)
 print("embedding_extended shape", embedding_extended.shape.tag.test_value)   # array([ 29, 128,  80]))
 
 rnn_outputs = rnn.apply(embedding_extended, mask=x_mask)
