@@ -26,6 +26,12 @@ import hickle
 word2vec = hickle.load('/home/andrewsm/SEER/services/deepner/server/data/embedding.0.hickle')
 embedding = word2vec['embedding']
 code2word = word2vec['vocab']
+
+last_element = len(code2word)-1
+unk = embedding.mean(axis=0)
+embedding[last_element] = unk
+code2word[last_element] = '<UNK>'
+
 word2code = {  v:i for i,v in enumerate(code2word) }
 
 ## These are set from the contents of the embedding file itself
@@ -109,10 +115,10 @@ class CoNLLTextFile(Dataset):
     _digits = re.compile('\d')
     unknown = None
 
-    def __init__(self, files, dictionary, **kwargs):
+    def __init__(self, files, dictionary, unknown_token, **kwargs):
         self.files = files
         self.dictionary = dictionary 
-        self.unknown = len(self.dictionary)  # Assume <UNK> is the last (?) entry in dictionary??
+        self.unknown = dictionary[unknown_token] # Error if not there
         
         super(CoNLLTextFile, self).__init__(**kwargs)
 
@@ -131,7 +137,7 @@ class CoNLLTextFile(Dataset):
                 break
             if ' ' in line:
                 l = line.split(' ')
-                labels.append(self.ner[ l[-1] ][1] ) # Just the second entry...
+                labels.append(self.ner[ l[-1] ][1] ) # Use just the second entry as the output target label...
                 word = l[0]
             else: 
                 word = line
@@ -154,7 +160,7 @@ class CoNLLTextFile(Dataset):
         state.close()
 
 data_paths = ['/home/andrewsm/SEER/external/CoNLL2003/ner/eng.train',]  # 3.3Mb file
-dataset = CoNLLTextFile(data_paths, dictionary=word2code)
+dataset = CoNLLTextFile(data_paths, dictionary=word2code, unknown_token='<UNK>')
 
 data_stream = DataStream(dataset)
 data_stream = Filter(data_stream, _filter_long)
