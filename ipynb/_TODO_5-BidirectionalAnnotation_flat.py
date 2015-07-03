@@ -15,7 +15,10 @@ from blocks.initialization import IsotropicGaussian, Constant
 
 from blocks.graph import ComputationGraph
 from blocks.filter import VariableFilter
-from blocks.roles import INPUT, WEIGHT, OUTPUT
+#from blocks.roles import INPUT, WEIGHT, OUTPUT
+
+from blocks.algorithms import (GradientDescent, Scale, StepClipping, CompositeRule)
+
 
 floatX = theano.config.floatX = 'float32'
 # theano.config.assert_no_cpu_op='raise'
@@ -277,8 +280,7 @@ class CategoricalCrossEntropy(Cost):
 ## Version with mask : 
 cce = tensor.nnet.categorical_crossentropy(label_probs, y.flatten())
 y_mask = x_mask.flatten()
-cost = (cce * y_mask) / y_mask.sum()             # elementwise multiple, followed by scaling 
-
+cost = (cce * y_mask).sum() / y_mask.sum()             # elementwise multiple, followed by scaling 
 
 ## Less explicit version
 #mlp = MLP([Softmax()], [hidden_dim, labels_size],
@@ -290,7 +292,32 @@ cost = (cce * y_mask) / y_mask.sum()             # elementwise multiple, followe
 
 #probs = mlp.apply(encoder.apply(lookup.apply(x)))
 #cost = CategoricalCrossEntropy().apply(y.flatten(), probs)
-#cg = ComputationGraph([cost])
+
+# Define the training algorithm.
+cg = ComputationGraph(cost)
+algorithm = GradientDescent(
+    cost=cost, 
+    params=cg.parameters,
+    step_rule=CompositeRule([StepClipping(10.0), Scale(0.01)]),
+)
+
+main_loop = MainLoop(
+    model=model,
+    data_stream=data_stream,
+    algorithm=algorithm,
+    extensions=[
+        Timing(),
+        TrainingDataMonitoring(observables, after_batch=True),
+        average_monitoring,
+        FinishAfter(after_n_batches=num_batches),
+        
+        # Saving the model and the log separately is convenient,
+        # because loading the whole pickle takes quite some time.
+        Checkpoint(save_path, every_n_batches=500, save_separately=["model", "log"]),
+        Printing(every_n_batches=1)
+    ]
+)
+main_loop.run()
 
 
 
