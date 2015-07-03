@@ -160,19 +160,19 @@ data_stream = Batch(data_stream, iteration_scheme=ConstantScheme(3))
 data_stream = Padding(data_stream)                # Adds a mask fields to each piece of the stream
 data_stream = Mapping(data_stream, _transpose)    # Flips stream so that sentences run down columns, batches along rows (strangely)
 
-for data in data_stream.get_epoch_iterator():
-    print(data)
-    break
+if False: # print sample
+  for data in data_stream.get_epoch_iterator():
+      print(data)
+      break
 
-exit(0)
 """
 Comments indicate that a reshaping has to be done, so let's think 
 about sizes of the arrays...
 """
 
-x = tensor.lmatrix('sentences')
+x = tensor.lmatrix('tokens')
 
-x_mask = tensor.matrix('sentences_mask', dtype=floatX)
+x_mask = tensor.matrix('tokens_mask', dtype=floatX)
 #rnn.apply(inputs=input_to_hidden.apply(x), mask=x_mask)
 
 lookup = LookupTable(vocab_size, embedding_dim)
@@ -372,7 +372,7 @@ numpy < 1.8 instead.
 [2] https://mail.python.org/pipermail/cython-devel/2012-January/001848.html 
 """
 
-#print("TODO :: masks for input layer")
+#print("TODO :: masks for input and output layer")
 """
 Cost functions that respect masks for variable-length input (produced with Padding)
 
@@ -386,7 +386,7 @@ See mask reshape/multiplication for costs somewhere near :
 https://github.com/mila-udem/blocks/blob/master/blocks/bricks/sequence_generators.py#L277
 """
 
-print("TODO :: text reader from CoNLL")
+#print("TODO :: text reader from CoNLL")
 """
 This can be simplified, assuming --docstart-- is a one-word sentence with label 'O'
 Should add it to vocab (? maybe <UNK> for one word is good enough)
