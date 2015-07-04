@@ -168,7 +168,7 @@ class CoNLLTextFile(Dataset):
             spelling_ner = []
             extras.append( [ caps, ] + spelling_ner )  # include spelling-related NER vector
             
-        return (np.array(tokens, dtype="int32"), np.array(extras, dtype=floatX), np.array(labels, dtype="int8"))   
+        return (np.array(tokens, dtype="int32"), np.array(extras, dtype=floatX), np.array(labels, dtype="int32"))   
     
     def close(self, state):
         state.close()
@@ -277,6 +277,7 @@ y = tensor.lmatrix('labels')                    # This is a symbolic vector of i
 y.tag.test_value = np.random.randint( labels_size, size=batch_of_sentences )
 
 print("y shape", y.shape.tag.test_value)                                # array([ 29, 16]))
+print("y.flatten() shape", y.flatten().shape.tag.test_value)            # array([ 29, 16]))
 
 """
 class CategoricalCrossEntropy(Cost):
@@ -291,6 +292,8 @@ class CategoricalCrossEntropy(Cost):
 cce = tensor.nnet.categorical_crossentropy(label_probs, y.flatten())
 y_mask = x_mask.flatten()
 cost = (cce * y_mask).sum() / y_mask.sum()             # elementwise multiple, followed by scaling 
+print("Created explicit cost:");
+print(cost)
 
 ## Less explicit version
 #mlp = MLP([Softmax()], [hidden_dim, labels_size],
@@ -305,7 +308,12 @@ cost = (cce * y_mask).sum() / y_mask.sum()             # elementwise multiple, f
 
 # Define the training algorithm.
 cg = ComputationGraph(cost)
-print("Created ComputationGraph");
+
+#print("Created ComputationGraph, variables:");
+#print(cg.variables)
+
+print("Created ComputationGraph, parameters:");
+print(cg.parameters)
 
 algorithm = GradientDescent(
     cost=cost, 
