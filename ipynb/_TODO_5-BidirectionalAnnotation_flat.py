@@ -317,7 +317,9 @@ cg = ComputationGraph(cost)
 #print(cg.variables)
 
 print("Created ComputationGraph, parameters:");
-print(cg.parameters)
+#print(cg.parameters)
+for p in cg.parameters:
+  print(str(p), p.shape, p.dtype)
 
 algorithm = GradientDescent(
     cost=cost, 
@@ -329,7 +331,7 @@ print("Defined Algorithm");
 model = Model(cost)
 print("Defined Model");
 
-obs_max_length = named_copy(x.shape[0], "max_length")
+obs_max_length = named_copy(x.shape[0], "obs_max_length")
 observables = [
     cost, 
     obs_max_length,
