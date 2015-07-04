@@ -330,7 +330,8 @@ algorithm = GradientDescent(
   params=cg.parameters,  # shifting this list does not change type-error index
   #params=cg.parameters[0:2],  # chomping NO Effect on 'int' message
   #params=cg.parameters[3:],   # chomping NO Effect on 'int' message
-  step_rule=CompositeRule( [StepClipping(10.0), Scale(0.01), ] ),
+  
+  #step_rule=CompositeRule( [StepClipping(10.0), Scale(0.01), ] ),  # Still same message
 )
 print("Defined Algorithm");
 
