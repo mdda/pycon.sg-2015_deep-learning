@@ -115,64 +115,64 @@ def _transpose(data):
     return tuple(array.T for array in data)
 
 class CoNLLTextFile(Dataset):
-    provides_sources = ("tokens", "extras", "labels", )
-    ner={
-      'O'     :(0, 0), 
-      'I-PER' :(0, 1), 
-      'I-LOC' :(0, 2), 
-      'I-ORG' :(0, 3), 
-      'I-MISC':(0, 4), 
-      'B-PER' :(1, 1), 
-      'B-LOC' :(1, 2), 
-      'B-ORG' :(1, 3), 
-      'B-MISC':(1, 4), 
-    }
-    _digits = re.compile('\d')
-    unknown = None
+  provides_sources = ("tokens", "extras", "labels", )
+  ner={
+    'O'     :(0, 0), 
+    'I-PER' :(0, 1), 
+    'I-LOC' :(0, 2), 
+    'I-ORG' :(0, 3), 
+    'I-MISC':(0, 4), 
+    'B-PER' :(1, 1), 
+    'B-LOC' :(1, 2), 
+    'B-ORG' :(1, 3), 
+    'B-MISC':(1, 4), 
+  }
+  _digits = re.compile('\d')
+  unknown = None
 
-    def __init__(self, files, dictionary, unknown_token, **kwargs):
-        self.files = files
-        self.dictionary = dictionary 
-        self.unknown = dictionary[unknown_token] # Error if not there
-        
-        super(CoNLLTextFile, self).__init__(**kwargs)
-
-    def open(self):
-        return chain(*[iter_( codecs.open(f, encoding="latin1") ) for f in self.files])
-        #return codecs.open(self.fname, encoding="latin1")
-        
-    def get_data(self, state, request=None):
-        if request is not None:
-            raise ValueError
-        tokens, extras, labels = [], [], []
-        while True:
-            # 'state' is the open file, read entries until we hit a ''
-            line = next(state).rstrip()
-            if len(line)==0:
-                break
-            if ' ' in line:
-                l = line.split(' ')
-                labels.append(self.ner[ l[-1] ][1] ) # Use just the second entry as the output target label...
-                word = l[0]
-            else: 
-                word = line
-            
-            token=word.lower()
-            caps = 0. if word == token else 1.
-            
-            if bool(self._digits.search(token)):
-                #print("NUMBER found in %s" % (token))
-                token = re.sub(r'\d+', 'NUMBER', token)
-            
-            tokens.append( self.dictionary.get(token, self.unknown) )
-            
-            spelling_ner = []
-            extras.append( [ caps, ] + spelling_ner )  # include spelling-related NER vector
-            
-        return (np.array(tokens, dtype="int32"), np.array(extras, dtype=floatX), np.array(labels, dtype="int32"))   
+  def __init__(self, files, dictionary, unknown_token, **kwargs):
+    self.files = files
+    self.dictionary = dictionary 
+    self.unknown = dictionary[unknown_token] # Error if not there
     
-    def close(self, state):
-        state.close()
+    super(CoNLLTextFile, self).__init__(**kwargs)
+
+  def open(self):
+    return chain(*[iter_( codecs.open(f, encoding="latin1") ) for f in self.files])
+    #return codecs.open(self.fname, encoding="latin1")
+      
+  def get_data(self, state, request=None):
+    if request is not None:
+      raise ValueError
+    tokens, extras, labels = [], [], []
+    while True:
+      # 'state' is the open file, read entries until we hit a ''
+      line = next(state).rstrip()
+      if len(line)==0:
+        break
+      if ' ' in line:
+        l = line.split(' ')
+        labels.append(self.ner[ l[-1] ][1] ) # Use just the second entry as the output target label...
+        word = l[0]
+      else: 
+        word = line
+      
+      token=word.lower()
+      caps = 0. if word == token else 1.
+      
+      if bool(self._digits.search(token)):
+        #print("NUMBER found in %s" % (token))
+        token = re.sub(r'\d+', 'NUMBER', token)
+      
+      tokens.append( self.dictionary.get(token, self.unknown) )
+      
+      spelling_ner = []
+      extras.append( [ caps, ] + spelling_ner )  # include spelling-related NER vector
+      
+    return (np.array(tokens, dtype="int32"), np.array(extras, dtype=floatX), np.array(labels, dtype="int32"))   
+  
+  def close(self, state):
+    state.close()
 
 data_paths = ['/home/andrewsm/SEER/external/CoNLL2003/ner/eng.train',]  # 3.3Mb file
 dataset = CoNLLTextFile(data_paths, dictionary=word2code, unknown_token='<UNK>')
@@ -188,8 +188,8 @@ data_stream = Mapping(data_stream, _transpose)    # Flips stream so that sentenc
 
 if False: # print sample
   for data in data_stream.get_epoch_iterator():
-      print(data)
-      break
+    print(data)
+    break
 
 """
 Comments indicate that a reshaping has to be done, so let's think 
@@ -291,12 +291,15 @@ class CategoricalCrossEntropy(Cost):
 #cost = CategoricalCrossEntropy().apply(y.flatten(), label_probs)
 
 ## Version with mask : 
-cce = tensor.nnet.categorical_crossentropy(label_probs, y.flatten())
+#cce = tensor.nnet.categorical_crossentropy(label_probs, y.flatten())
+cce = tensor.nnet.crossentropy_categorical_1hot(label_probs, y.flatten())
 y_mask = x_mask.flatten()
 print("y_mask shape", y_mask.shape.tag.test_value)                      # array([464]))
 print("y_mask dtype", y_mask.dtype)                                     # float32
 
 cost = (cce * y_mask).sum() / y_mask.sum()             # elementwise multiple, followed by scaling 
+
+#cost = label_probs.sum()  # FAKE!
 print("Created explicit cost:");
 print(cost)
 
@@ -323,9 +326,11 @@ for p in cg.parameters:
     print(str(p), p.shape, p.dtype)
 
 algorithm = GradientDescent(
-    cost=cost, 
-    params=cg.parameters,  # shifting this list does not change type-error index
-    step_rule=CompositeRule( [StepClipping(10.0), Scale(0.01), ] ),
+  cost=cost, 
+  params=cg.parameters,  # shifting this list does not change type-error index
+  #params=cg.parameters[0:2],  # chomping NO Effect on 'int' message
+  #params=cg.parameters[3:],   # chomping NO Effect on 'int' message
+  step_rule=CompositeRule( [StepClipping(10.0), Scale(0.01), ] ),
 )
 print("Defined Algorithm");
 
@@ -334,28 +339,30 @@ print("Defined Model");
 
 obs_max_length = named_copy(x.shape[0], "obs_max_length")
 observables = [
-    cost, 
-    obs_max_length,
-    #min_energy, max_energy, 
-    #mean_activation,
+  cost, 
+  obs_max_length,
+  #min_energy, max_energy, 
+  #mean_activation,
 ]
 
 main_loop = MainLoop(
-    model=model,
-    data_stream=data_stream,
-    algorithm=algorithm,
-    extensions=[
-        Timing(),
-        TrainingDataMonitoring(observables, after_batch=True),
-        #average_monitoring,
-        FinishAfter(after_n_batches=num_batches),
-        
-        # Saving the model and the log separately is convenient,
-        # because loading the whole pickle takes quite some time.
-        Checkpoint(checkpoint_save_path, every_n_batches=500, save_separately=["model", "log"]),
-        Printing(every_n_batches=1)
-    ]
+  model=model,
+  data_stream=data_stream,
+  algorithm=algorithm,
 )
+if False:
+  extensions=[
+    Timing(),
+    TrainingDataMonitoring(observables, after_batch=True),
+    #average_monitoring,
+    FinishAfter(after_n_batches=num_batches),
+    
+    # Saving the model and the log separately is convenient,
+    # because loading the whole pickle takes quite some time.
+    Checkpoint(checkpoint_save_path, every_n_batches=500, save_separately=["model", "log"]),
+    Printing(every_n_batches=1)
+  ]
+
 print("Defined MainLoop");
 
 main_loop.run()
@@ -364,12 +371,12 @@ main_loop.run()
 
 
 # Alternatively, during test-time
+if False:
+  labels_out = labels_raw.argmax(axis=1)
+  print("labels_out shape", labels_out.shape.tag.test_value)              # array([ 464 ]))
 
-labels_out = labels_raw.argmax(axis=1)
-print("labels_out shape", labels_out.shape.tag.test_value)              # array([ 464 ]))
-
-labels = labels_out.reshape( batch_of_sentences )
-print("labels shape", labels.shape.tag.test_value)                      # array([ 29, 16]))
+  labels = labels_out.reshape( batch_of_sentences )
+  print("labels shape", labels.shape.tag.test_value)                      # array([ 29, 16]))
 
 
 
