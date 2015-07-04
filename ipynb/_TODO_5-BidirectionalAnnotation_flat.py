@@ -195,7 +195,7 @@ Comments indicate that a reshaping has to be done, so let's think
 about sizes of the arrays...
 """
 
-x = tensor.lmatrix('tokens')
+x = tensor.matrix('tokens', dtype="int32")
 
 x_mask = tensor.matrix('tokens_mask', dtype=floatX)
 #rnn.apply(inputs=input_to_hidden.apply(x), mask=x_mask)
@@ -241,7 +241,7 @@ gather.initialize()
 ## Now for the application of these units
 
 # Define the shape of x specifically...  :: the data has format (batch, features).
-x.tag.test_value       = np.random.randint(vocab_size, size=batch_of_sentences )
+x.tag.test_value       = np.random.randint(vocab_size, size=batch_of_sentences ).astype(np.int32)
 x_extra.tag.test_value = np.zeros( (max_sentence_length, mini_batch_size, 1) ).astype(np.float32)
 x_mask.tag.test_value  = np.random.choice( [0.0, 1.0], size=batch_of_sentences ).astype(np.float32)
 
@@ -273,11 +273,12 @@ label_probs = p_labels.apply(labels_raw)               # This is a list of label
 print("label_probs shape", label_probs.shape.tag.test_value)            # array([ 464, 5]))            
 # -- so :: this is an in-place rescaling
 
-y = tensor.lmatrix('labels')                    # This is a symbolic vector of ints (implies one-hot in categorical_crossentropy)
-y.tag.test_value = np.random.randint( labels_size, size=batch_of_sentences )
+y = tensor.matrix('labels', dtype="int32")   # This is a symbolic vector of ints (implies one-hot in categorical_crossentropy)
+y.tag.test_value = np.random.randint( labels_size, size=batch_of_sentences).astype(np.int32)
 
 print("y shape", y.shape.tag.test_value)                                # array([ 29, 16]))
-print("y.flatten() shape", y.flatten().shape.tag.test_value)            # array([ 29, 16]))
+print("y.flatten() shape", y.flatten().shape.tag.test_value)            # array([464]))
+print("y.flatten() dtype", y.flatten().dtype)                           # int64
 
 """
 class CategoricalCrossEntropy(Cost):
@@ -291,6 +292,9 @@ class CategoricalCrossEntropy(Cost):
 ## Version with mask : 
 cce = tensor.nnet.categorical_crossentropy(label_probs, y.flatten())
 y_mask = x_mask.flatten()
+print("y_mask shape", y_mask.shape.tag.test_value)                      # array([464]))
+print("y_mask dtype", y_mask.dtype)                                     # float32
+
 cost = (cce * y_mask).sum() / y_mask.sum()             # elementwise multiple, followed by scaling 
 print("Created explicit cost:");
 print(cost)
