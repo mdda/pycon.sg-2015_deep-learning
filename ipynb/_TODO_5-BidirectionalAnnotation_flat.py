@@ -182,7 +182,7 @@ data_stream = Filter(data_stream, _filter_long)
 
 data_stream = Batch(data_stream, iteration_scheme=ConstantScheme(3))
 
-data_stream = Padding(data_stream)                # Adds a mask fields to each piece of the stream
+data_stream = Padding(data_stream, mask_sources=('tokens'))             # Adds a mask fields to this stream field, type='floatX'
 data_stream = Mapping(data_stream, _transpose)    # Flips stream so that sentences run down columns, batches along rows (strangely)
 
 if False: # print sample
