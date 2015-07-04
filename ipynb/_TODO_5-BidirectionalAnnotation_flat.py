@@ -7,7 +7,7 @@ from theano import tensor
 from blocks.bricks import Identity, Linear, Tanh, MLP, Softmax
 from blocks.bricks.lookup import LookupTable
 from blocks.bricks.recurrent import SimpleRecurrent, Bidirectional, BaseRecurrent
-from blocks.bricks.parallel import Merge
+#from blocks.bricks.parallel import Merge
 #from blocks.bricks.parallel import Fork
 
 from blocks.bricks.cost import CategoricalCrossEntropy
@@ -47,7 +47,8 @@ word2code = {  v:i for i,v in enumerate(code2word) }
 #vocab_size=4
 #embedding_dim=40
 
-print("Embedding shape :", embedding.shape)    # (4347, 100)
+print("Embedding shape :", embedding.shape)                             # (4347, 100)
+print("Embedding dtype :", embedding.dtype)                             # float32
 vocab_size, embedding_dim = embedding.shape
 
 extra_size = 1 # (caps,)
@@ -278,7 +279,7 @@ y.tag.test_value = np.random.randint( labels_size, size=batch_of_sentences).asty
 
 print("y shape", y.shape.tag.test_value)                                # array([ 29, 16]))
 print("y.flatten() shape", y.flatten().shape.tag.test_value)            # array([464]))
-print("y.flatten() dtype", y.flatten().dtype)                           # int64
+print("y.flatten() dtype", y.flatten().dtype)                           # int32
 
 """
 class CategoricalCrossEntropy(Cost):
@@ -319,11 +320,11 @@ cg = ComputationGraph(cost)
 print("Created ComputationGraph, parameters:");
 #print(cg.parameters)
 for p in cg.parameters:
-  print(str(p), p.shape, p.dtype)
+    print(str(p), p.shape, p.dtype)
 
 algorithm = GradientDescent(
     cost=cost, 
-    params=cg.parameters,
+    params=cg.parameters,  # shifting this list does not change type-error index
     step_rule=CompositeRule( [StepClipping(10.0), Scale(0.01), ] ),
 )
 print("Defined Algorithm");
