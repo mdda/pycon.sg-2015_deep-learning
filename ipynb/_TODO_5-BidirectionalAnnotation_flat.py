@@ -30,7 +30,8 @@ floatX = theano.config.floatX = 'float32'
 # theano.config.assert_no_cpu_op='raise'
 
 theano.config.compute_test_value = 'raise'
-theano.config.optimizer='None'  # Not a Python None
+#theano.config.optimizer='None'  # Not a Python None
+theano.config.optimizer='fast_compile'
 
 import hickle
 word2vec = hickle.load('/home/andrewsm/SEER/services/deepner/server/data/embedding.0.hickle')
@@ -59,7 +60,7 @@ hidden_dim = embedding_dim+extra_size  # RNN units align over total embedding si
 labels_size=5 # ( 0 .. 4 inclusive ), see range of CoNLLTextFile.ner values
 
 max_sentence_length = 29
-mini_batch_size = 16
+mini_batch_size = 8
 # This becomes the size of the RNN 'output', 
 # each place with a (hidden_dim*2) vector (x2 because it's bidirectional)
 
@@ -184,7 +185,7 @@ data_stream = DataStream(dataset)
 data_stream = Filter(data_stream, _filter_long)
 #data_stream = Mapping(data_stream, reverse_words, add_sources=("targets",))
 
-data_stream = Batch(data_stream, iteration_scheme=ConstantScheme(3))
+data_stream = Batch(data_stream, iteration_scheme=ConstantScheme(mini_batch_size))
 
 #data_stream = Padding(data_stream, mask_sources=('tokens'))            # Adds a mask fields to this stream field, type='floatX'
 data_stream = Padding(data_stream, )              # Adds a mask fields to this stream field, type='floatX'
@@ -254,7 +255,7 @@ x_mask.tag.test_value  = np.random.choice( [0.0, 1.0], size=batch_of_sentences )
 #tensor.reshape(x, batch_of_sentences  )
 #x = tensor.specify_shape(x_base, batch_of_sentences)
 #print("x (new) shape", x.shape.eval())
-print("x (new) shape", x.shape.tag.test_value)                          # array([29, 16]))
+print("x shape", x.shape.tag.test_value)                                # array([29, 16]))
 
 word_embedding = lookup.apply(x)
 print("word_embedding shape", word_embedding.shape.tag.test_value)      # array([ 29, 16, 100]))
@@ -269,7 +270,8 @@ print("rnn_outputs shape", rnn_outputs.shape.tag.test_value)            # array(
 ### So : Need to reshape the rnn outputs to produce suitable input here...
 # Convert a tensor here into a long stream of vectors
 
-rnn_outputs_reshaped = rnn_outputs.reshape( (max_sentence_length*mini_batch_size, hidden_dim*2) )
+#rnn_outputs_reshaped = rnn_outputs.reshape( (max_sentence_length*mini_batch_size, hidden_dim*2) )
+rnn_outputs_reshaped = rnn_outputs.reshape( (x.shape[0]*mini_batch_size, hidden_dim*2) )  # This depends on the batch...
 print("rnn_outputs_reshaped shape", rnn_outputs_reshaped.shape.tag.test_value)   #array([464, 202]))
 
 labels_raw = gather.apply(rnn_outputs_reshaped)  # This is pre-softmaxing
