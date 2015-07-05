@@ -64,7 +64,7 @@ mini_batch_size = 8
 # This becomes the size of the RNN 'output', 
 # each place with a (hidden_dim*2) vector (x2 because it's bidirectional)
 
-num_batches=1000  # For the whole main_loop
+num_batches=10000  # For the whole main_loop
 
 #batch_of_sentences = (mini_batch_size, max_sentence_length)
 batch_of_sentences = (max_sentence_length, mini_batch_size)  # Since the data_stream has a _transpose
@@ -175,8 +175,8 @@ class CoNLLTextFile(Dataset):
       
     return (np.array(tokens, dtype="int32"), np.array(extras, dtype=floatX), np.array(labels, dtype="int32"))   
   
-  def close(self, state):
-    state.close()
+  #def close(self, state):
+  #  state.close()
 
 data_paths = ['/home/andrewsm/SEER/external/CoNLL2003/ner/eng.train',]  # 3.3Mb file
 dataset = CoNLLTextFile(data_paths, dictionary=word2code, unknown_token='<UNK>')
@@ -272,7 +272,7 @@ print("rnn_outputs shape", rnn_outputs.shape.tag.test_value)            # array(
 # Convert a tensor here into a long stream of vectors
 
 #rnn_outputs_reshaped = rnn_outputs.reshape( (max_sentence_length*mini_batch_size, hidden_dim*2) )
-rnn_outputs_reshaped = rnn_outputs.reshape( (x.shape[0]*mini_batch_size, hidden_dim*2) )  # This depends on the batch...
+rnn_outputs_reshaped = rnn_outputs.reshape( (x.shape[0]*x.shape[1], hidden_dim*2) )  # This depends on the batch... (and last one in epoch may be smaller)
 print("rnn_outputs_reshaped shape", rnn_outputs_reshaped.shape.tag.test_value)   #array([464, 202]))
 
 labels_raw = gather.apply(rnn_outputs_reshaped)  # This is pre-softmaxing
