@@ -305,6 +305,7 @@ print("y_mask shape", y_mask.shape.tag.test_value)                      # array(
 print("y_mask dtype", y_mask.dtype)                                     # float32
 
 cost = (cce * y_mask).sum() / y_mask.sum()             # elementwise multiple, followed by scaling 
+cost.name='crossentropy_categorical_1hot_masked'
 
 #cost = label_probs.sum()  # FAKE!
 print("Created explicit cost:");
