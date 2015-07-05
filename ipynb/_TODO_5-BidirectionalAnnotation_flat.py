@@ -192,9 +192,10 @@ data_stream = Padding(data_stream, )              # Adds a mask fields to this s
 data_stream = Mapping(data_stream, _transpose)    # Flips stream so that sentences run down columns, batches along rows (strangely)
 
 if False: # print sample
-  for data in data_stream.get_epoch_iterator():
-    print(data)
-    break
+  for i, data in enumerate(data_stream.get_epoch_iterator()):
+    print(i)
+    #print(data)
+    #break
   exit(0)
   
 """
