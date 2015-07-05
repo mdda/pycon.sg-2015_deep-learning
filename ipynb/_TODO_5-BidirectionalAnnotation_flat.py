@@ -175,8 +175,6 @@ class CoNLLTextFile(Dataset):
       
     return (np.array(tokens, dtype="int32"), np.array(extras, dtype=floatX), np.array(labels, dtype="int32"))   
   
-  #def close(self, state):
-  #  state.close()
 
 data_paths = ['/home/andrewsm/SEER/external/CoNLL2003/ner/eng.train',]  # 3.3Mb file
 dataset = CoNLLTextFile(data_paths, dictionary=word2code, unknown_token='<UNK>')
@@ -363,7 +361,8 @@ main_loop = MainLoop(
     Timing(),
     TrainingDataMonitoring(observables, after_batch=True),
     #average_monitoring,
-    FinishAfter(after_n_batches=num_batches),
+    #FinishAfter(after_n_batches=num_batches),
+    FinishAfter(after_n_epochs=50),
     
     # Saving the model and the log separately is convenient,
     # because loading the whole pickle takes quite some time.
