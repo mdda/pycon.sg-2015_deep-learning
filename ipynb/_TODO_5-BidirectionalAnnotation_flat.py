@@ -30,6 +30,7 @@ floatX = theano.config.floatX = 'float32'
 # theano.config.assert_no_cpu_op='raise'
 
 theano.config.compute_test_value = 'raise'
+theano.config.optimizer='None'  # Not a Python None
 
 import hickle
 word2vec = hickle.load('/home/andrewsm/SEER/services/deepner/server/data/embedding.0.hickle')
