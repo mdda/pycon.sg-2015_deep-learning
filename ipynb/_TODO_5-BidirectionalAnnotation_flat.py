@@ -64,7 +64,7 @@ mini_batch_size = 8
 # This becomes the size of the RNN 'output', 
 # each place with a (hidden_dim*2) vector (x2 because it's bidirectional)
 
-num_batches=10  # For the whole main_loop
+num_batches=1000  # For the whole main_loop
 
 #batch_of_sentences = (mini_batch_size, max_sentence_length)
 batch_of_sentences = (max_sentence_length, mini_batch_size)  # Since the data_stream has a _transpose
@@ -368,7 +368,7 @@ main_loop = MainLoop(
     # Saving the model and the log separately is convenient,
     # because loading the whole pickle takes quite some time.
     Checkpoint(checkpoint_save_path, every_n_batches=500, save_separately=["model", "log"]),
-    Printing(every_n_batches=1)
+    Printing(every_n_batches=100)
   ]
 )
 if False:
