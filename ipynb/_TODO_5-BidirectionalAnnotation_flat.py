@@ -337,11 +337,8 @@ print(cg.inputs)
 
 algorithm = GradientDescent(
   cost=cost, 
-  params=cg.parameters,  # shifting this list does not change type-error index
-  #params=cg.parameters[0:2],  # chomping NO Effect on 'int' message
-  #params=cg.parameters[3:],   # chomping NO Effect on 'int' message
-  
-  #step_rule=CompositeRule( [StepClipping(10.0), Scale(0.01), ] ),  # Still same message
+  params=cg.parameters,
+  step_rule=CompositeRule( [StepClipping(10.0), Scale(0.01), ] ),
 )
 print("Defined Algorithm");
 
@@ -360,8 +357,6 @@ main_loop = MainLoop(
   model=model,
   data_stream=data_stream,
   algorithm=algorithm,
-)
-if False:
   extensions=[
     Timing(),
     TrainingDataMonitoring(observables, after_batch=True),
@@ -373,7 +368,10 @@ if False:
     Checkpoint(checkpoint_save_path, every_n_batches=500, save_separately=["model", "log"]),
     Printing(every_n_batches=1)
   ]
-
+)
+if False:
+  pass
+  
 print("Defined MainLoop");
 
 main_loop.run()
