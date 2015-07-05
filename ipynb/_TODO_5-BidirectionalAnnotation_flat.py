@@ -112,7 +112,9 @@ def _filter_long(data):
     return len(data[0]) <= max_sentence_length
 
 def _transpose(data):
-    return tuple(array.T for array in data)
+    #return tuple(array.T for array in data)  # Works for 1 and 2-d data
+    #return tuple(np.transpose(array, axes=[1,0]) for array in data)  # No - need to specify all axes in this function
+    return tuple(np.rollaxis(array, 1, 0) for array in data)  # Keeps tensor pieces sacrosanct too
 
 class CoNLLTextFile(Dataset):
   provides_sources = ("tokens", "extras", "labels", )
@@ -183,14 +185,16 @@ data_stream = Filter(data_stream, _filter_long)
 
 data_stream = Batch(data_stream, iteration_scheme=ConstantScheme(3))
 
-data_stream = Padding(data_stream, mask_sources=('tokens'))             # Adds a mask fields to this stream field, type='floatX'
+#data_stream = Padding(data_stream, mask_sources=('tokens'))            # Adds a mask fields to this stream field, type='floatX'
+data_stream = Padding(data_stream, )              # Adds a mask fields to this stream field, type='floatX'
 data_stream = Mapping(data_stream, _transpose)    # Flips stream so that sentences run down columns, batches along rows (strangely)
 
 if False: # print sample
   for data in data_stream.get_epoch_iterator():
     print(data)
     break
-
+  exit(0)
+  
 """
 Comments indicate that a reshaping has to be done, so let's think 
 about sizes of the arrays...
@@ -324,6 +328,9 @@ print("Created ComputationGraph, parameters:");
 #print(cg.parameters)
 for p in cg.parameters:
     print(str(p), p.shape, p.dtype)
+
+print("Created ComputationGraph, inputs:");
+print(cg.inputs)
 
 algorithm = GradientDescent(
   cost=cost, 
