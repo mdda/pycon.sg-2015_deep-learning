@@ -232,14 +232,18 @@ p_labels = Softmax()
 
 ## Let's initialize the variables
 lookup.allocate()
-print("lookup.params=", lookup.params)                                  # ('lookup.params=', [W])
+#print("lookup.params=", lookup.params)                                  # ('lookup.params=', [W])
 
 #lookup.weights_init = FUNCTION
 #lookup.initialize() 
 
 #lookup.params[0].set_value( np.random.normal( scale = 0.1, size=(vocab_size, embedding_dim) ).astype(np.float32) )
-lookup.params[0].set_value( embedding )
+#lookup.params[0].set_value( embedding )
 
+# See : https://github.com/mila-udem/blocks/blob/master/tests/bricks/test_lookup.py
+#lookup.W.set_value(numpy.arange(15).reshape(5, 3).astype(theano.config.floatX))
+lookup.W.set_value( embedding.astype(theano.config.floatX) )
+    
 rnn.initialize()
 gather.initialize()
 
