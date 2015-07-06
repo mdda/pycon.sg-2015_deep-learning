@@ -232,7 +232,7 @@ p_labels = Softmax()
 
 ## Let's initialize the variables
 lookup.allocate()
-#print("lookup.params=", lookup.params)                                  # ('lookup.params=', [W])
+#print("lookup.parameters=", lookup.parameters)                         # ('lookup.parameters=', [W])
 
 #lookup.weights_init = FUNCTION
 #lookup.initialize() 
@@ -342,7 +342,7 @@ print(cg.inputs)
 
 algorithm = GradientDescent(
   cost=cost, 
-  params=cg.parameters,
+  parameters=cg.parameters,
   step_rule=CompositeRule( [StepClipping(10.0), Scale(0.01), ] ),
 )
 print("Defined Algorithm");
