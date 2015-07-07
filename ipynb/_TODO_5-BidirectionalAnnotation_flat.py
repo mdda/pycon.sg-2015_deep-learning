@@ -33,6 +33,8 @@ theano.config.compute_test_value = 'raise'
 #theano.config.optimizer='None'  # Not a Python None
 theano.config.optimizer='fast_compile'
 
+run_test = True
+
 import hickle
 #word2vec = hickle.load('/home/andrewsm/SEER/services/deepner/server/data/embedding.0.hickle')
 word2vec = hickle.load('/home/andrewsm/SEER/services/deepner/server/data/embedding.20.hickle')
@@ -179,8 +181,10 @@ class CoNLLTextFile(Dataset):
     else:
       raise StopIteration
 
-#data_paths = ['/home/andrewsm/SEER/external/CoNLL2003/ner/eng.testb',]  # 748Kb file
-data_paths = ['/home/andrewsm/SEER/external/CoNLL2003/ner/eng.train',]  # 3.3Mb file
+if run_test:
+  data_paths = ['/home/andrewsm/SEER/external/CoNLL2003/ner/eng.testb',]  # 748Kb file
+else:
+  data_paths = ['/home/andrewsm/SEER/external/CoNLL2003/ner/eng.train',]  # 3.3Mb file
 dataset = CoNLLTextFile(data_paths, dictionary=word2code, unknown_token='<UNK>')
 
 data_stream = DataStream(dataset)
@@ -291,112 +295,98 @@ print("rnn_outputs_reshaped shape", rnn_outputs_reshaped.shape.tag.test_value)  
 labels_raw = gather.apply(rnn_outputs_reshaped)  # This is pre-softmaxing
 print("labels_raw shape", labels_raw.shape.tag.test_value)              # array([ 464, 5]))
 
-label_probs = p_labels.apply(labels_raw)               # This is a list of label probabilities
-print("label_probs shape", label_probs.shape.tag.test_value)            # array([ 464, 5]))            
-# -- so :: this is an in-place rescaling
+if not run_test:
+  label_probs = p_labels.apply(labels_raw)               # This is a list of label probabilities
+  print("label_probs shape", label_probs.shape.tag.test_value)            # array([ 464, 5]))            
+  # -- so :: this is an in-place rescaling
 
-y = tensor.matrix('labels', dtype="int32")   # This is a symbolic vector of ints (implies one-hot in categorical_crossentropy)
-y.tag.test_value = np.random.randint( labels_size, size=batch_of_sentences).astype(np.int32)
+  y = tensor.matrix('labels', dtype="int32")   # This is a symbolic vector of ints (implies one-hot in categorical_crossentropy)
+  y.tag.test_value = np.random.randint( labels_size, size=batch_of_sentences).astype(np.int32)
 
-print("y shape", y.shape.tag.test_value)                                # array([ 29, 16]))
-print("y.flatten() shape", y.flatten().shape.tag.test_value)            # array([464]))
-print("y.flatten() dtype", y.flatten().dtype)                           # int32
+  print("y shape", y.shape.tag.test_value)                                # array([ 29, 16]))
+  print("y.flatten() shape", y.flatten().shape.tag.test_value)            # array([464]))
+  print("y.flatten() dtype", y.flatten().dtype)                           # int32
 
-"""
-class CategoricalCrossEntropy(Cost):
-    @application(outputs=["cost"])
-    def apply(self, y, y_hat):
-        cost = tensor.nnet.categorical_crossentropy(y_hat, y).mean()
-        return cost
-"""
-#cost = CategoricalCrossEntropy().apply(y.flatten(), label_probs)
+  """
+  class CategoricalCrossEntropy(Cost):
+      @application(outputs=["cost"])
+      def apply(self, y, y_hat):
+          cost = tensor.nnet.categorical_crossentropy(y_hat, y).mean()
+          return cost
+  """
+  #cost = CategoricalCrossEntropy().apply(y.flatten(), label_probs)
 
-## Version with mask : 
-#cce = tensor.nnet.categorical_crossentropy(label_probs, y.flatten())
-cce = tensor.nnet.crossentropy_categorical_1hot(label_probs, y.flatten())
-y_mask = x_mask.flatten()
-print("y_mask shape", y_mask.shape.tag.test_value)                      # array([464]))
-print("y_mask dtype", y_mask.dtype)                                     # float32
+  ## Version with mask : 
+  #cce = tensor.nnet.categorical_crossentropy(label_probs, y.flatten())
+  cce = tensor.nnet.crossentropy_categorical_1hot(label_probs, y.flatten())
+  y_mask = x_mask.flatten()
+  print("y_mask shape", y_mask.shape.tag.test_value)                      # array([464]))
+  print("y_mask dtype", y_mask.dtype)                                     # float32
 
-cost = (cce * y_mask).sum() / y_mask.sum()             # elementwise multiple, followed by scaling 
-cost.name='crossentropy_categorical_1hot_masked'
+  cost = (cce * y_mask).sum() / y_mask.sum()             # elementwise multiple, followed by scaling 
+  cost.name='crossentropy_categorical_1hot_masked'
 
-#cost = label_probs.sum()  # FAKE!
-print("Created explicit cost:");
-print(cost)
+  print("Created explicit cost:");
+  print(cost)
 
-## Less explicit version
-#mlp = MLP([Softmax()], [hidden_dim, labels_size],
-#          weights_init=IsotropicGaussian(0.01),
-#          biases_init=Constant(0))
+  # Define the training algorithm.
+  cg = ComputationGraph(cost)
 
-#print(encoder.prototype.apply.sequences)
-#dir(encoder.prototype.apply.sequences)
+  #print("Created ComputationGraph, variables:");
+  #print(cg.variables)
 
-#probs = mlp.apply(encoder.apply(lookup.apply(x)))
-#cost = CategoricalCrossEntropy().apply(y.flatten(), probs)
-
-# Define the training algorithm.
-cg = ComputationGraph(cost)
-
-#print("Created ComputationGraph, variables:");
-#print(cg.variables)
-
-print("Created ComputationGraph, parameters:");
-#print(cg.parameters)
-for p in cg.parameters:
+  print("Created ComputationGraph, parameters:");
+  #print(cg.parameters)
+  for p in cg.parameters:
     print(str(p), p.shape, p.dtype)
 
-print("Created ComputationGraph, inputs:");
-print(cg.inputs)
+  print("Created ComputationGraph, inputs:");
+  print(cg.inputs)
 
-algorithm = GradientDescent(
-  cost=cost, 
-  parameters=cg.parameters,
-  step_rule=CompositeRule( [StepClipping(10.0), Scale(0.01), ] ),
-)
-print("Defined Algorithm");
+  algorithm = GradientDescent(
+    cost=cost, 
+    parameters=cg.parameters,
+    step_rule=CompositeRule( [StepClipping(10.0), Scale(0.01), ] ),
+  )
+  print("Defined Algorithm");
 
-model = Model(cost)
-print("Defined Model");
+  model = Model(cost)
+  print("Defined Model");
 
-obs_max_length = named_copy(x.shape[0], "obs_max_length")
-observables = [
-  cost, 
-  obs_max_length,
-  #min_energy, max_energy, 
-  #mean_activation,
-]
-
-main_loop = MainLoop(
-  model=model,
-  data_stream=data_stream,
-  algorithm=algorithm,
-  extensions=[
-    Timing(),
-    TrainingDataMonitoring(observables, after_batch=True),
-    #average_monitoring,
-    #FinishAfter(after_n_batches=num_batches),
-    FinishAfter(after_n_epochs=50),
-    
-    # Saving the model and the log separately is convenient,
-    # because loading the whole pickle takes quite some time.
-    Checkpoint(checkpoint_save_path, every_n_batches=500, save_separately=["model", "log"]),
-    Printing(every_n_batches=100)
+  obs_max_length = named_copy(x.shape[0], "obs_max_length")
+  observables = [
+    cost, 
+    obs_max_length,
+    #min_energy, max_energy, 
+    #mean_activation,
   ]
-)
-if False:
-  pass
-  
-print("Defined MainLoop");
 
-main_loop.run()
+  main_loop = MainLoop(
+    model=model,
+    data_stream=data_stream,
+    algorithm=algorithm,
+    extensions=[
+      Timing(),
+      TrainingDataMonitoring(observables, after_batch=True),
+      #average_monitoring,
+      #FinishAfter(after_n_batches=num_batches),
+      FinishAfter(after_n_epochs=50),
+      
+      # Saving the model and the log separately is convenient,
+      # because loading the whole pickle takes quite some time.
+      Checkpoint(checkpoint_save_path, every_n_batches=500, save_separately=["model", "log"]),
+      Printing(every_n_batches=100)
+    ]
+  )
+  if False:
+    pass
+    
+  print("Defined MainLoop");
 
+  main_loop.run()
 
-
-
-# Alternatively, during test-time
-if False:
+else:
+  # Alternatively, during test-time
   labels_out = labels_raw.argmax(axis=1)
   print("labels_out shape", labels_out.shape.tag.test_value)              # array([ 464 ]))
 
@@ -404,11 +394,25 @@ if False:
   print("labels shape", labels.shape.tag.test_value)                      # array([ 29, 16]))
 
 
+  # Define the training algorithm.
+  cg = ComputationGraph(labels)
 
-## Debugging computation overall :
-cg = ComputationGraph([cost])
+  #print("Created ComputationGraph, variables:");
+  #print(cg.variables)
+
+  print("Created ComputationGraph, parameters:");
+  #print(cg.parameters)
+  for p in cg.parameters:
+    print(str(p), p.shape, p.dtype)
+
+  print("Created ComputationGraph, inputs:");
+  print(cg.inputs)
+
 
 if False:
+  ## Debugging computation overall :
+  cg = ComputationGraph([cost])
+  
   #print(cg.variables)
   #print( VariableFilter(roles=[OUTPUT])(cg.variables) )
 
