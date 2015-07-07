@@ -173,11 +173,14 @@ class CoNLLTextFile(Dataset):
       
       spelling_ner = []
       extras.append( [ caps, ] + spelling_ner )  # include spelling-related NER vector
-      
-    return (np.array(tokens, dtype="int32"), np.array(extras, dtype=floatX), np.array(labels, dtype="int32"))   
-  
+    
+    if len(tokens)>0:
+      return (np.array(tokens, dtype="int32"), np.array(extras, dtype=floatX), np.array(labels, dtype="int32"))   
+    else:
+      raise StopIteration
 
-data_paths = ['/home/andrewsm/SEER/external/CoNLL2003/ner/eng.train',]  # 3.3Mb file
+data_paths = ['/home/andrewsm/SEER/external/CoNLL2003/ner/eng.testb',]  # 748Kb file
+#data_paths = ['/home/andrewsm/SEER/external/CoNLL2003/ner/eng.train',]  # 3.3Mb file
 dataset = CoNLLTextFile(data_paths, dictionary=word2code, unknown_token='<UNK>')
 
 data_stream = DataStream(dataset)
@@ -190,9 +193,12 @@ data_stream = Batch(data_stream, iteration_scheme=ConstantScheme(mini_batch_size
 data_stream = Padding(data_stream, )              # Adds a mask fields to this stream field, type='floatX'
 data_stream = Mapping(data_stream, _transpose)    # Flips stream so that sentences run down columns, batches along rows (strangely)
 
-if False: # print sample
+if True: # print sample
+  t=0
   for i, data in enumerate(data_stream.get_epoch_iterator()):
-    print(i)
+    #print(i)
+    t=t + data[4].sum() + data[0].shape[1]
+    print(i, data[0].shape, t)
     #print(data)
     #break
   exit(0)
