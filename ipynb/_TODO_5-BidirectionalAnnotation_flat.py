@@ -404,6 +404,8 @@ else:
   print("Created ComputationGraph, inputs:");
   print(cg.inputs)
   
+  # Strangely, all the examples use : DataStreamMonitoring in MainLoop
+  
   label_ner = cg.get_theano_function()
 
   for test_data in data_stream.get_epoch_iterator():
