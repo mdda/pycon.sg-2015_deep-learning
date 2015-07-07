@@ -385,10 +385,11 @@ if not run_test:
 else:
   # Alternatively, during test-time
   labels_out = labels_raw.argmax(axis=1)
-  print("labels_out shape", labels_out.shape.tag.test_value)              # array([ 464 ]))
+  print("labels_out shape", labels_out.shape.tag.test_value)            # array([ 464 ]))
 
-  labels = labels_out.reshape( batch_of_sentences )
-  print("labels shape", labels.shape.tag.test_value)                      # array([ 29, 16]))
+  #rnn_outputs_reshaped = rnn_outputs.reshape( (x.shape[0]*x.shape[1], hidden_dim*2) )  
+  labels = labels_out.reshape( (x.shape[0], x.shape[1]) )               # This depends on the batch... (and last one in epoch may be smaller)
+  print("labels shape", labels.shape.tag.test_value)                    # array([ 29, 16]))
 
   # Define the training algorithm.
   cg = ComputationGraph(labels)
@@ -405,12 +406,28 @@ else:
   print(cg.inputs)
   
   # Strangely, all the examples use : DataStreamMonitoring in MainLoop
+
+  model = Model(labels)
+  print("Model.dict_of_inputs():");
+  print(model.dict_of_inputs())
+
+  ## Model loading to come soon
+  #model.set_parameter_values(load_parameter_values(save_path))  
   
-  label_ner = cg.get_theano_function()
+  
+  #label_ner = cg.get_theano_function()
+  label_ner = model.get_theano_function()
+
 
   for test_data in data_stream.get_epoch_iterator():
-    results = label_ner(test_data)
+    ordered_batch = test_data[0:3]   # Explicitly strip off the pre-defined labels
+    #print(ordered_batch)
+    
+    #results = label_ner(*test_data)
+    results = label_ner(*ordered_batch)  
+    
     print(results)
+    exit(0)
     
 
 if False:
