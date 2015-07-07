@@ -393,7 +393,6 @@ else:
   labels = labels_out.reshape( batch_of_sentences )
   print("labels shape", labels.shape.tag.test_value)                      # array([ 29, 16]))
 
-
   # Define the training algorithm.
   cg = ComputationGraph(labels)
 
@@ -407,7 +406,13 @@ else:
 
   print("Created ComputationGraph, inputs:");
   print(cg.inputs)
+  
+  label_ner = cg.get_theano_function()
 
+  for test_data in data_stream.get_epoch_iterator():
+    results = label_ner(test_data)
+    print(results)
+    
 
 if False:
   ## Debugging computation overall :
