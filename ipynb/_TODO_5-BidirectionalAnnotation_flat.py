@@ -60,7 +60,7 @@ hidden_dim = embedding_dim+extra_size  # RNN units align over total embedding si
 
 labels_size=5 # ( 0 .. 4 inclusive ), see range of CoNLLTextFile.ner values
 
-max_sentence_length = 29
+max_sentence_length = 128 # There's a long sentence in testb... (124 words)
 mini_batch_size = 8
 # This becomes the size of the RNN 'output', 
 # each place with a (hidden_dim*2) vector (x2 because it's bidirectional)
@@ -179,8 +179,8 @@ class CoNLLTextFile(Dataset):
     else:
       raise StopIteration
 
-data_paths = ['/home/andrewsm/SEER/external/CoNLL2003/ner/eng.testb',]  # 748Kb file
-#data_paths = ['/home/andrewsm/SEER/external/CoNLL2003/ner/eng.train',]  # 3.3Mb file
+#data_paths = ['/home/andrewsm/SEER/external/CoNLL2003/ner/eng.testb',]  # 748Kb file
+data_paths = ['/home/andrewsm/SEER/external/CoNLL2003/ner/eng.train',]  # 3.3Mb file
 dataset = CoNLLTextFile(data_paths, dictionary=word2code, unknown_token='<UNK>')
 
 data_stream = DataStream(dataset)
@@ -193,12 +193,16 @@ data_stream = Batch(data_stream, iteration_scheme=ConstantScheme(mini_batch_size
 data_stream = Padding(data_stream, )              # Adds a mask fields to this stream field, type='floatX'
 data_stream = Mapping(data_stream, _transpose)    # Flips stream so that sentences run down columns, batches along rows (strangely)
 
-if True: # print sample
-  t=0
+if False: # print sample
+  #t=0
+  max_len=0
   for i, data in enumerate(data_stream.get_epoch_iterator()):
     #print(i)
-    t=t + data[4].sum() + data[0].shape[1]
-    print(i, data[0].shape, t)
+    #t=t + data[4].sum() + data[0].shape[1]
+    l=data[0].shape[0]
+    if l>max_len:
+      max_len = l
+    print(i, data[0].shape, max_len)
     #print(data)
     #break
   exit(0)
