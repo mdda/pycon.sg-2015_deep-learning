@@ -378,11 +378,8 @@ if not run_test:
       Printing(every_n_batches=100)
     ]
   )
-  if False:
-    pass
-    
-  print("Defined MainLoop");
-
+  print("Defined MainLoop")
+  
   main_loop.run()
 
 else:
@@ -472,36 +469,6 @@ IndexError: tuple index out of range
 
 """
 
-#print("TODO :: Find out about numpy.ndarray size changed warning")
-"""
-Warning :: RuntimeWarning: numpy.ndarray size changed
-=> try ::
-theano-cache clear 
-
-python >>>
-np.version.version
-'1.9.2'
-np.__file__ 
-'/usr/lib64/python2.7/site-packages/numpy/__init__.pyc'
-
-rpm -qa | grep numpy
-numpy-1.9.2-1.fc22.x86_64
-
-
-https://groups.google.com/forum/#!topic/theano-users/A__NVIBYMxA ::
-
-OK, so this is actually due to the new array interface of numpy 1.8 
-interacting with Cython. According to [1] and [2], it is harmless. 
-
-One of these posts suggests recompiling the Cython code to get rid of 
-the warning, but I'm not sure if it would actually help, and it could 
-make the warning appear on the majority of installations with 
-numpy < 1.8 instead. 
-
-[1] http://mail.scipy.org/pipermail/numpy-discussion/2012-April/061741.html 
-[2] https://mail.python.org/pipermail/cython-devel/2012-January/001848.html 
-"""
-
 #print("TODO :: masks for input and output layer")
 """
 Cost functions that respect masks for variable-length input (produced with Padding)
@@ -516,8 +483,3 @@ See mask reshape/multiplication for costs somewhere near :
 https://github.com/mila-udem/blocks/blob/master/blocks/bricks/sequence_generators.py#L277
 """
 
-#print("TODO :: text reader from CoNLL")
-"""
-This can be simplified, assuming --docstart-- is a one-word sentence with label 'O'
-Should add it to vocab (? maybe <UNK> for one word is good enough)
-"""
