@@ -415,8 +415,8 @@ else:
   print("Model.dict_of_inputs():");
   print(model.dict_of_inputs())
 
-  ## Model loading to come soon
-  #model.set_parameter_values(load_parameter_values(save_path))  
+  ## Model loading from saved file
+  model.set_parameter_values(load_parameter_values(save_path))  
   
   
   #label_ner = cg.get_theano_function()
