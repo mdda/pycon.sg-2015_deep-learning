@@ -25,6 +25,7 @@ from blocks.extensions import FinishAfter, Printing, Timing
 from blocks.extensions.saveload import Checkpoint
 from blocks.extensions.monitoring import TrainingDataMonitoring
 from blocks.utils import named_copy
+from blocks.serialization import load_parameter_values
 
 floatX = theano.config.floatX = 'float32'
 # theano.config.assert_no_cpu_op='raise'
