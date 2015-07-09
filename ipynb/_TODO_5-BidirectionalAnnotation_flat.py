@@ -71,7 +71,7 @@ num_batches=10000  # For the whole main_loop
 # each element being a (hidden_dim*2) vector (x2 because it's bidirectional)
 batch_of_sentences = (max_sentence_length, mini_batch_size)  # Since the data_stream has a _transpose
 
-checkpoint_save_path='saved_state.npz'
+save_state_path='saved_state.npz'
 
 """
 Deep BiRNN for Blocks
@@ -377,8 +377,8 @@ if not run_test:
       
       # Saving the model and the log separately is convenient,
       # because loading the whole pickle takes quite some time.
-      #Checkpoint(checkpoint_save_path, every_n_batches=2000*10, save_separately=["model", "log"]),
-      Checkpoint(checkpoint_save_path, every_n_epochs=10, save_separately=["model", "log"]),
+      #Checkpoint(save_state_path, every_n_batches=2000*10, save_separately=["model", "log"]),
+      Checkpoint(save_state_path, every_n_epochs=10, save_separately=["model", "log"]),
       Printing(every_n_batches=500)
     ]
   )
@@ -417,23 +417,18 @@ else:
   print(model.dict_of_inputs())
 
   ## Model loading from saved file
-  model.set_parameter_values(load_parameter_values(save_path))  
-  
-  
-  #label_ner = cg.get_theano_function()
+  model.set_parameter_values(load_parameter_values(save_state_path))  
+    
   label_ner = model.get_theano_function()
-
 
   for test_data in data_stream.get_epoch_iterator():
     ordered_batch = test_data[0:3]   # Explicitly strip off the pre-defined labels
     #print(ordered_batch)
     
-    #results = label_ner(*test_data)
     results = label_ner(*ordered_batch)
+    #print(results)  # This is a pure array of labels
     
     inputs = _transpose(ordered_batch)
-    
-    #print(results)  # This is a pure array of labels
     for tokens, mask, labels in zip(inputs[0], inputs[1], np.transpose(results)):
       #print(labels)
       for (token, m, label) in zip(tokens, mask, labels.tolist()):
@@ -441,9 +436,11 @@ else:
           break  # once the mask is off, no need to keep going on this sentence
         #print(token, label[0]) 
         print("%s %s" % (code2word[token], dataset.code2label[ label[0] ]) ) 
+      # End of sentence
       print("")
-    print("")
-    
+    # End of batch
+  print("")
+  # End of input
 
 if False:
   ## Debugging computation overall :
