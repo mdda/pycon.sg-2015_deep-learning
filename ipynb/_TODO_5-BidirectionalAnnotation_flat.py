@@ -391,19 +391,20 @@ else:
   labels = labels_out.reshape( (x.shape[0], x.shape[1]) )               # This depends on the batch... (and last one in epoch may be smaller)
   print("labels shape", labels.shape.tag.test_value)                    # array([ 29, 16]))
 
-  # Define the training algorithm.
-  cg = ComputationGraph(labels)
+  if False:
+    # Define the testing algorithm.
+    cg = ComputationGraph(labels)
 
-  #print("Created ComputationGraph, variables:");
-  #print(cg.variables)
+    #print("Created ComputationGraph, variables:");
+    #print(cg.variables)
 
-  print("Created ComputationGraph, parameters:");
-  #print(cg.parameters)
-  for p in cg.parameters:
-    print(str(p), p.shape, p.dtype)
+    print("Created ComputationGraph, parameters:");
+    #print(cg.parameters)
+    for p in cg.parameters:
+      print(str(p), p.shape, p.dtype)
 
-  print("Created ComputationGraph, inputs:");
-  print(cg.inputs)
+    print("Created ComputationGraph, inputs:");
+    print(cg.inputs)
   
   # Strangely, all the examples use : DataStreamMonitoring in MainLoop
 
