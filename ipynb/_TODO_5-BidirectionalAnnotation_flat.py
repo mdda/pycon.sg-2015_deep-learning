@@ -33,7 +33,7 @@ theano.config.compute_test_value = 'raise'
 #theano.config.optimizer='None'  # Not a Python None
 theano.config.optimizer='fast_compile'
 
-run_test = True and False
+run_test = True # and False
 
 import hickle
 #word2vec = hickle.load('/home/andrewsm/SEER/services/deepner/server/data/embedding.0.hickle')
@@ -372,11 +372,12 @@ if not run_test:
       
       #FinishAfter(after_n_batches=num_batches),
       #FinishAfter(after_n_epochs=50),
-      FinishAfter(after_n_epochs=1),
+      FinishAfter(after_n_epochs=50),
       
       # Saving the model and the log separately is convenient,
       # because loading the whole pickle takes quite some time.
-      Checkpoint(checkpoint_save_path, every_n_batches=2000*10, save_separately=["model", "log"]),
+      #Checkpoint(checkpoint_save_path, every_n_batches=2000*10, save_separately=["model", "log"]),
+      Checkpoint(checkpoint_save_path, every_n_epochs=10, save_separately=["model", "log"]),
       Printing(every_n_batches=500)
     ]
   )
