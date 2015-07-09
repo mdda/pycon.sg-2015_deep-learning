@@ -123,7 +123,7 @@ def _transpose(data):
 
 class CoNLLTextFile(Dataset):
   provides_sources = ("tokens", "extras", "labels", )
-  ner={
+  label2code={
     'O'     :(0, 0), 
     'I-PER' :(0, 1), 
     'I-LOC' :(0, 2), 
@@ -142,6 +142,8 @@ class CoNLLTextFile(Dataset):
     self.dictionary = dictionary 
     self.unknown = dictionary[unknown_token] # Error if not there
     
+    self.code2label = { c[1]:l for (l,c) in self.label2code.items() if c[0]==0 }
+    #print(self.code2label)
     super(CoNLLTextFile, self).__init__(**kwargs)
 
   def open(self):
@@ -159,7 +161,7 @@ class CoNLLTextFile(Dataset):
         break
       if ' ' in line:
         l = line.split(' ')
-        labels.append(self.ner[ l[-1] ][1] ) # Use just the second entry as the output target label...
+        labels.append(self.label2code[ l[-1] ][1] ) # Use just the second entry as the output target label...
         word = l[0]
       else: 
         word = line
@@ -425,9 +427,20 @@ else:
     #print(ordered_batch)
     
     #results = label_ner(*test_data)
-    results = label_ner(*ordered_batch)  
+    results = label_ner(*ordered_batch)
     
-    print(results)
+    inputs = _transpose(ordered_batch)
+    
+    print(results)  # This is a pure array of labels
+    for tokens, mask, labels in zip(inputs[0], inputs[1], np.transpose(results)):
+      print("Sentence:")
+      #print(labels)
+      for (token, m, label) in zip(tokens, mask, labels.tolist()):
+        if m==0.: 
+          break  # once the mask is off, no need to keep going on this sentence
+        #print(token, label[0]) 
+        #print(dataset.label2code)
+        print(token, dataset.code2label[ label[0] ]) 
     exit(0)
     
 
