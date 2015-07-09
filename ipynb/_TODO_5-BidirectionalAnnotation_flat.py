@@ -33,7 +33,7 @@ theano.config.compute_test_value = 'raise'
 #theano.config.optimizer='None'  # Not a Python None
 theano.config.optimizer='fast_compile'
 
-run_test = True
+run_test = True and False
 
 import hickle
 #word2vec = hickle.load('/home/andrewsm/SEER/services/deepner/server/data/embedding.0.hickle')
@@ -64,15 +64,13 @@ labels_size=5 # ( 0 .. 4 inclusive ), see range of CoNLLTextFile.ner values
 
 max_sentence_length = 128 # There's a long sentence in testb... (124 words)
 mini_batch_size = 8
-# This becomes the size of the RNN 'output', 
-# each place with a (hidden_dim*2) vector (x2 because it's bidirectional)
-
 num_batches=10000  # For the whole main_loop
 
-#batch_of_sentences = (mini_batch_size, max_sentence_length)
+# This also defines the maximum size of the RNN 'output' stage - 
+# each element being a (hidden_dim*2) vector (x2 because it's bidirectional)
 batch_of_sentences = (max_sentence_length, mini_batch_size)  # Since the data_stream has a _transpose
 
-checkpoint_save_path='.'
+checkpoint_save_path='saved_state.npz'
 
 """
 Deep BiRNN for Blocks
@@ -101,8 +99,8 @@ pip install git+git://github.com/mila-udem/blocks.git@master
          
 Usage of RecurrentStack :
 https://github.com/sotelo/poet/blob/master/poet.py
-         
 """
+
 import codecs
 import re
 
@@ -371,13 +369,15 @@ if not run_test:
       Timing(),
       TrainingDataMonitoring(observables, after_batch=True),
       #average_monitoring,
+      
       #FinishAfter(after_n_batches=num_batches),
-      FinishAfter(after_n_epochs=50),
+      #FinishAfter(after_n_epochs=50),
+      FinishAfter(after_n_epochs=1),
       
       # Saving the model and the log separately is convenient,
       # because loading the whole pickle takes quite some time.
-      Checkpoint(checkpoint_save_path, every_n_batches=500, save_separately=["model", "log"]),
-      Printing(every_n_batches=100)
+      Checkpoint(checkpoint_save_path, every_n_batches=2000*10, save_separately=["model", "log"]),
+      Printing(every_n_batches=500)
     ]
   )
   print("Defined MainLoop")
@@ -435,7 +435,7 @@ else:
     for tokens, mask, labels in zip(inputs[0], inputs[1], np.transpose(results)):
       #print(labels)
       for (token, m, label) in zip(tokens, mask, labels.tolist()):
-        if m==0.: 
+        if m<0.1: 
           break  # once the mask is off, no need to keep going on this sentence
         #print(token, label[0]) 
         print("%s %s" % (code2word[token], dataset.code2label[ label[0] ]) ) 
