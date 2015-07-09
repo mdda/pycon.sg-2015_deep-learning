@@ -431,16 +431,15 @@ else:
     
     inputs = _transpose(ordered_batch)
     
-    print(results)  # This is a pure array of labels
+    #print(results)  # This is a pure array of labels
     for tokens, mask, labels in zip(inputs[0], inputs[1], np.transpose(results)):
-      print("Sentence:")
       #print(labels)
       for (token, m, label) in zip(tokens, mask, labels.tolist()):
         if m==0.: 
           break  # once the mask is off, no need to keep going on this sentence
         #print(token, label[0]) 
-        #print(dataset.label2code)
-        print(token, dataset.code2label[ label[0] ]) 
+        print("%s %s" % (code2word[token], dataset.code2label[ label[0] ]) ) 
+      print("")
     exit(0)
     
 
