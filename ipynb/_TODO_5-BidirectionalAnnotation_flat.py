@@ -440,7 +440,7 @@ else:
         #print(token, label[0]) 
         print("%s %s" % (code2word[token], dataset.code2label[ label[0] ]) ) 
       print("")
-    exit(0)
+    print("")
     
 
 if False:
