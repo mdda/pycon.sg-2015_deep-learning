@@ -186,6 +186,10 @@ if run_test:
   data_paths = ['/home/andrewsm/SEER/external/CoNLL2003/ner/eng.testb',]  # 748Kb file
 else:
   data_paths = ['/home/andrewsm/SEER/external/CoNLL2003/ner/eng.train',]  # 3.3Mb file
+  
+## Achieved result: 50-epochs (GPU) training on eng.train => testb overall scores :
+## accuracy:  96.42%; precision:  76.95%; recall:  80.26%; FB1:  78.57
+
 dataset = CoNLLTextFile(data_paths, dictionary=word2code, unknown_token='<UNK>')
 
 data_stream = DataStream(dataset)
