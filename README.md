@@ -34,16 +34,20 @@ pip install -r requirements.txt
 # Wait 10mins (107Mb of stuff in env/lib/python2.7/site-packages/)
 ```
 
-## Running the Presentation
+## Running the Presentation 
+
+Starting at the live-plotting example (which will also want ``bokeh-server`` running, see below) :
 
 ```
 . env/bin/activate
-ipython notebook ipynb/Deep-Learning-with-Blocks-and-Theano.ipynb 
+ipython notebook ipynb/1-LivePlotting.ipynb
 
 # Then open a browser at : http://localhost:8888/
-# or, more specifically  : http://localhost:8888/notebooks/Deep-Learning-with-Blocks-and-Theano.ipynb
+# or, more specifically  : http://localhost:8888/ipynb/1-LivePlotting.ipynb
+```
 
-## Another suggestion (--browser prevents the distracting launch of an browser window)
+If you have a browser already running, it may be best to use the ``--browser`` option to prevent the distracting launch of an additional browser window:
+```
 ipython notebook --port=8888 --browser=none
 ```
 
@@ -162,7 +166,7 @@ NOW DONE - submitted a PR for :
 ```
 
 There is a full write-up on how to install an Nvidia GPU under Fedora 22 
-as a [blog posting](http://blog.mdda.net/oss/2015/06/20/nvidia-on-fedora-22/)
+as a [blog posting](http://blog.mdda.net/oss/2015/07/07/nvidia-on-fedora-22/)
 
 And an additional write-up for the case that you're installing to a laptop
 with 'dual graphics cards' 
