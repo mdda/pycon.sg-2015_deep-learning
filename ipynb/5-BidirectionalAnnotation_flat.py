@@ -3,12 +3,9 @@ import numpy as np
 import theano
 from theano import tensor
 
-#from blocks import initialization
 from blocks.bricks import Identity, Linear, Tanh, MLP, Softmax
 from blocks.bricks.lookup import LookupTable
 from blocks.bricks.recurrent import SimpleRecurrent, Bidirectional, BaseRecurrent
-#from blocks.bricks.parallel import Merge
-#from blocks.bricks.parallel import Fork
 
 from blocks.bricks.cost import CategoricalCrossEntropy
 from blocks.initialization import IsotropicGaussian, Constant
@@ -31,6 +28,7 @@ floatX = theano.config.floatX = 'float32'
 # theano.config.assert_no_cpu_op='raise'
 
 theano.config.compute_test_value = 'raise'
+
 #theano.config.optimizer='None'  # Not a Python None
 theano.config.optimizer='fast_compile'
 
@@ -49,12 +47,10 @@ code2word[last_element] = '<UNK>'
 
 word2code = {  v:i for i,v in enumerate(code2word) }
 
-## These are set from the contents of the embedding file itself
-#vocab_size=4
-#embedding_dim=40
-
 print("Embedding shape :", embedding.shape)                             # (4347, 100)
 print("Embedding dtype :", embedding.dtype)                             # float32
+
+## These are set from the contents of the embedding file itself
 vocab_size, embedding_dim = embedding.shape
 
 extra_size = 1 # (caps,)
@@ -199,10 +195,10 @@ data_stream = Filter(data_stream, _filter_long)
 data_stream = Batch(data_stream, iteration_scheme=ConstantScheme(mini_batch_size))
 
 #data_stream = Padding(data_stream, mask_sources=('tokens'))            # Adds a mask fields to this stream field, type='floatX'
-data_stream = Padding(data_stream, )              # Adds a mask fields to this stream field, type='floatX'
+data_stream = Padding(data_stream, )              # Adds a mask fields to all of this stream's fields, type='floatX'
 data_stream = Mapping(data_stream, _transpose)    # Flips stream so that sentences run down columns, batches along rows (strangely)
 
-if False: # print sample
+if False: # print sample for debugging Dataset / DataStream component
   #t=0
   max_len=0
   for i, data in enumerate(data_stream.get_epoch_iterator()):
@@ -217,8 +213,8 @@ if False: # print sample
   exit(0)
   
 """
-Comments indicate that a reshaping has to be done, so let's think 
-about sizes of the arrays...
+Comments in google-groups:blocks indicate that a reshaping has to be done, 
+so let's think about sizes of the arrays...
 """
 
 x = tensor.matrix('tokens', dtype="int32")
@@ -227,7 +223,6 @@ x_mask = tensor.matrix('tokens_mask', dtype=floatX)
 #rnn.apply(inputs=input_to_hidden.apply(x), mask=x_mask)
 
 lookup = LookupTable(vocab_size, embedding_dim)
-#?? lookup.print_shapes=True
 
 x_extra = tensor.tensor3('extras', dtype=floatX)
 
@@ -275,9 +270,6 @@ x.tag.test_value       = np.random.randint(vocab_size, size=batch_of_sentences )
 x_extra.tag.test_value = np.zeros( (max_sentence_length, mini_batch_size, 1) ).astype(np.float32)
 x_mask.tag.test_value  = np.random.choice( [0.0, 1.0], size=batch_of_sentences ).astype(np.float32)
 
-#tensor.reshape(x, batch_of_sentences  )
-#x = tensor.specify_shape(x_base, batch_of_sentences)
-#print("x (new) shape", x.shape.eval())
 print("x shape", x.shape.tag.test_value)                                # array([29, 16]))
 
 word_embedding = lookup.apply(x)
@@ -293,24 +285,25 @@ print("rnn_outputs shape", rnn_outputs.shape.tag.test_value)            # array(
 ### So : Need to reshape the rnn outputs to produce suitable input here...
 # Convert a tensor here into a long stream of vectors
 
-#rnn_outputs_reshaped = rnn_outputs.reshape( (max_sentence_length*mini_batch_size, hidden_dim*2) )
-rnn_outputs_reshaped = rnn_outputs.reshape( (x.shape[0]*x.shape[1], hidden_dim*2) )  # This depends on the batch... (and last one in epoch may be smaller)
+# The shape actually depends on the specific batch... (for instance, the last one in an epoch may be smaller)
+#rnn_outputs_reshaped = rnn_outputs.reshape( (max_sentence_length*mini_batch_size, hidden_dim*2) )  # not parameterized properly
+rnn_outputs_reshaped = rnn_outputs.reshape( (x.shape[0]*x.shape[1], hidden_dim*2) )
 print("rnn_outputs_reshaped shape", rnn_outputs_reshaped.shape.tag.test_value)   #array([464, 202]))
 
 labels_raw = gather.apply(rnn_outputs_reshaped)  # This is pre-softmaxing
 print("labels_raw shape", labels_raw.shape.tag.test_value)              # array([ 464, 5]))
 
-if not run_test:
+if not run_test:  # i.e. do training phase
   label_probs = p_labels.apply(labels_raw)               # This is a list of label probabilities
-  print("label_probs shape", label_probs.shape.tag.test_value)            # array([ 464, 5]))            
+  print("label_probs shape", label_probs.shape.tag.test_value)          # array([ 464, 5]))
   # -- so :: this is an in-place rescaling
 
   y = tensor.matrix('labels', dtype="int32")   # This is a symbolic vector of ints (implies one-hot in categorical_crossentropy)
   y.tag.test_value = np.random.randint( labels_size, size=batch_of_sentences).astype(np.int32)
 
-  print("y shape", y.shape.tag.test_value)                                # array([ 29, 16]))
-  print("y.flatten() shape", y.flatten().shape.tag.test_value)            # array([464]))
-  print("y.flatten() dtype", y.flatten().dtype)                           # int32
+  print("y shape", y.shape.tag.test_value)                              # array([ 29, 16]))
+  print("y.flatten() shape", y.flatten().shape.tag.test_value)          # array([464]))
+  print("y.flatten() dtype", y.flatten().dtype)                         # int32
 
   """
   class CategoricalCrossEntropy(Cost):
@@ -322,8 +315,9 @@ if not run_test:
   #cost = CategoricalCrossEntropy().apply(y.flatten(), label_probs)
 
   ## Version with mask : 
-  #cce = tensor.nnet.categorical_crossentropy(label_probs, y.flatten())
+  #cce = tensor.nnet.categorical_crossentropy(label_probs, y.flatten()) # We can go deeper...
   cce = tensor.nnet.crossentropy_categorical_1hot(label_probs, y.flatten())
+
   y_mask = x_mask.flatten()
   print("y_mask shape", y_mask.shape.tag.test_value)                      # array([464]))
   print("y_mask dtype", y_mask.dtype)                                     # float32
@@ -395,8 +389,7 @@ else:
   labels_out = labels_raw.argmax(axis=1)
   print("labels_out shape", labels_out.shape.tag.test_value)            # array([ 464 ]))
 
-  #rnn_outputs_reshaped = rnn_outputs.reshape( (x.shape[0]*x.shape[1], hidden_dim*2) )  
-  labels = labels_out.reshape( (x.shape[0], x.shape[1]) )               # This depends on the batch... (and last one in epoch may be smaller)
+  labels = labels_out.reshape( (x.shape[0], x.shape[1]) )               # Again, this depends on the batch
   print("labels shape", labels.shape.tag.test_value)                    # array([ 29, 16]))
 
   if False:
