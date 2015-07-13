@@ -497,17 +497,3 @@ IndexError: tuple index out of range
 
 """
 
-#print("TODO :: masks for input and output layer")
-"""
-Cost functions that respect masks for variable-length input (produced with Padding)
-
-https://groups.google.com/forum/#!topic/blocks-users/O-S45G6tpNY
-Including target sequence mask in cost function for recurrent network
-
-https://github.com/mila-udem/blocks/issues/653
-Cost for recurrent networks
-
-See mask reshape/multiplication for costs somewhere near :
-https://github.com/mila-udem/blocks/blob/master/blocks/bricks/sequence_generators.py#L277
-"""
-
