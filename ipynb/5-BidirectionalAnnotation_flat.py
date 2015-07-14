@@ -32,7 +32,7 @@ theano.config.compute_test_value = 'raise'
 #theano.config.optimizer='None'  # Not a Python None
 theano.config.optimizer='fast_compile'
 
-run_test = True # and False
+run_test = True and False
 
 import hickle
 #word2vec = hickle.load('/home/andrewsm/SEER/services/deepner/server/data/embedding.0.hickle')
