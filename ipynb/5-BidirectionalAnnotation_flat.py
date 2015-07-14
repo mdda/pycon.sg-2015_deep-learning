@@ -32,7 +32,7 @@ theano.config.compute_test_value = 'raise'
 #theano.config.optimizer='None'  # Not a Python None
 theano.config.optimizer='fast_compile'
 
-run_test = True and False
+run_test = True #and False
 
 import hickle
 #word2vec = hickle.load('/home/andrewsm/SEER/services/deepner/server/data/embedding.0.hickle')
@@ -67,7 +67,8 @@ num_batches=10000  # For the whole main_loop
 # each element being a (hidden_dim*2) vector (x2 because it's bidirectional)
 batch_of_sentences = (max_sentence_length, mini_batch_size)  # Since the data_stream has a _transpose
 
-save_state_path='saved_state.npz'
+#save_state_path='saved_state.npz'
+save_state_path='train.10epochs.cpu'
 
 """
 Deep BiRNN for Blocks
@@ -412,11 +413,15 @@ else:
   model = Model(labels)
   print("Model.dict_of_inputs():");
   print(model.dict_of_inputs())
+  print("Model list inputs:");
+  print([ v.name for v in model.inputs])
 
   ## Model loading from saved file
   model.set_parameter_values(load_parameter_values(save_state_path))  
     
   label_ner = model.get_theano_function()
+  print(model.inputs())
+  print("printed label_ner.params")
 
   for test_data in data_stream.get_epoch_iterator():
     ordered_batch = test_data[0:3]   # Explicitly strip off the pre-defined labels
