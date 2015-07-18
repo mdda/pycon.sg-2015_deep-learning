@@ -32,7 +32,7 @@ theano.config.compute_test_value = 'raise'
 #theano.config.optimizer='None'  # Not a Python None
 theano.config.optimizer='fast_compile'
 
-run_test = True #and False
+run_test = True and False
 
 import hickle
 #word2vec = hickle.load('/home/andrewsm/SEER/services/deepner/server/data/embedding.0.hickle')
@@ -338,7 +338,7 @@ if not run_test:  # i.e. do training phase
   print("Created ComputationGraph, parameters:");
   #print(cg.parameters)
   for p in cg.parameters:
-    print(str(p), p.shape, p.dtype)
+    print(str(p), p.dtype, p.shape.tag.test_value)
 
   print("Created ComputationGraph, inputs:");
   print(cg.inputs)
