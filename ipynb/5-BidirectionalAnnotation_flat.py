@@ -308,8 +308,7 @@ def examine_embedding(embedding):
     if token_i is None:
       print("Found token '%s' NOT FOUND " % (token_target,))
       continue
-      
-    print("Found token '%s' at %d" % (token_target, token_i))
+    #print("Found token '%s' at %d" % (token_target, token_i))
     
     token_v = e[token_i]
     #print("self-cosine similarity %f" % (np.dot(token_v,token_v)))
@@ -318,11 +317,11 @@ def examine_embedding(embedding):
     #print("overall similarity shape: ", all_similarities.shape)  # a 1-d array
     
     sorted_similarities = sorted( enumerate(all_similarities), key=lambda (i,v): -v)
-    print("Top Similarities for %20s :" % (token_target,), 
-      map(lambda (i,v): "%s %.1f%%" % (code2word[i],v*100.), sorted_similarities[0:10]) 
+    print("Top Similarities for %10s @ %4d:" % (token_target,token_i, ), 
+      map(lambda (i,v): "%s %.1f%%" % (code2word[i],v*100.), sorted_similarities[1:4])  # Element [0] is token itself
     )
   
-  exit(0)
+  #exit(0)
 
 if not run_test:  # i.e. do training phase
   label_probs = p_labels.apply(labels_raw)               # This is a list of label probabilities
@@ -450,9 +449,11 @@ else:
 
   ## Model loading from saved file
   model.set_parameter_values(load_parameter_values(save_state_path))  
+
+  examine_embedding(lookup.W.get_value())
     
   label_ner = model.get_theano_function()
-  print(model.inputs())
+  print(model.inputs)
   print("printed label_ner.params")
 
   for test_data in data_stream.get_epoch_iterator():
