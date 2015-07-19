@@ -294,6 +294,11 @@ print("rnn_outputs_reshaped shape", rnn_outputs_reshaped.shape.tag.test_value)  
 labels_raw = gather.apply(rnn_outputs_reshaped)  # This is pre-softmaxing
 print("labels_raw shape", labels_raw.shape.tag.test_value)              # array([ 464, 5]))
 
+
+def examine_embedding(e):
+  print("Examine Embedding Shape : ", e.shape)
+  exit(0)
+
 if not run_test:  # i.e. do training phase
   label_probs = p_labels.apply(labels_raw)               # This is a list of label probabilities
   print("label_probs shape", label_probs.shape.tag.test_value)          # array([ 464, 5]))
@@ -305,6 +310,8 @@ if not run_test:  # i.e. do training phase
   print("y shape", y.shape.tag.test_value)                              # array([ 29, 16]))
   print("y.flatten() shape", y.flatten().shape.tag.test_value)          # array([464]))
   print("y.flatten() dtype", y.flatten().dtype)                         # int32
+
+  examine_embedding(lookup.W.get_value())
 
   """
   class CategoricalCrossEntropy(Cost):
