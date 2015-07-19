@@ -314,7 +314,7 @@ def examine_embedding(embedding):
   print("overall similarity shape: ", all_similarities.shape)  # a 1-d array
   
   sorted_similarities = sorted( enumerate(all_similarities), key=lambda (i,v): -v)
-  print("Top Similarities ", map(lambda (i,v): "%s %6.1f%%" % (code2word[i],v*100.), sorted_similarities[0:10]) )
+  print("Top Similarities ", map(lambda (i,v): "%s %.1f%%" % (code2word[i],v*100.), sorted_similarities[0:10]) )
   
   exit(0)
 
