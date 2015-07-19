@@ -298,17 +298,23 @@ print("labels_raw shape", labels_raw.shape.tag.test_value)              # array(
 def examine_embedding(embedding):
   e = embedding.copy()
   print("Examine Embedding Shape : ", e.shape)
-  norms = np.apply_along_axis(np.linalg.norm, 1, e)  # normalize all vectors in the embedding
-  #e /= 
-  print("Examine Embedding norms Shape : ", norms[:,0].shape)
+  
+  norms = np.apply_along_axis(np.linalg.norm, 1, e).reshape( (e.shape[0],1) )  # normalize all vectors in the embedding
+  print("Examine Embedding norms Shape : ", norms.shape)
+  e = e / norms
   
   token_target = "london"
   token_i = word2code.get(token_target, None)
   print("Found token '%s' at %d" % (token_target, token_i))
   
   token_v = e[token_i]
-  
   print("self-cosine similarity %f" % (np.dot(token_v,token_v)))
+  
+  all_similarities = np.dot(e, token_v)
+  print("overall similarity shape: ", all_similarities.shape)  # a 1-d array
+  
+  sorted_similarities = sorted( enumerate(all_similarities), key=lambda (i,v): -v)
+  print("Top Similarities ", map(lambda (i,v): "%s %6.1f%%" % (code2word[i],v*100.), sorted_similarities[0:10]) )
   
   exit(0)
 
