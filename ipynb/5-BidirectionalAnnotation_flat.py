@@ -125,8 +125,8 @@ class CoNLLTextFile(Dataset):
     'I-LOC' :(0, 2), 
     'I-ORG' :(0, 3), 
     'I-MISC':(0, 4), 
-    'B-PER' :(1, 1), 
-    'B-LOC' :(1, 2), 
+    'B-PER' :(1, 1),  # These 'Beginning' labels are not used ('B-PER' does not appear in training or testa)
+    'B-LOC' :(1, 2),  # These 'Beginning' labels are not used (others are very infrequent ~ 0.2%)
     'B-ORG' :(1, 3), 
     'B-MISC':(1, 4), 
   }
