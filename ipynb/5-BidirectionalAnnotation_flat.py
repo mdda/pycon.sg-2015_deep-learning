@@ -300,21 +300,27 @@ def examine_embedding(embedding):
   print("Examine Embedding Shape : ", e.shape)
   
   norms = np.apply_along_axis(np.linalg.norm, 1, e).reshape( (e.shape[0],1) )  # normalize all vectors in the embedding
-  print("Examine Embedding norms Shape : ", norms.shape)
+  #print("Examine Embedding norms Shape : ", norms.shape)
   e = e / norms
   
-  token_target = "london"
-  token_i = word2code.get(token_target, None)
-  print("Found token '%s' at %d" % (token_target, token_i))
-  
-  token_v = e[token_i]
-  print("self-cosine similarity %f" % (np.dot(token_v,token_v)))
-  
-  all_similarities = np.dot(e, token_v)
-  print("overall similarity shape: ", all_similarities.shape)  # a 1-d array
-  
-  sorted_similarities = sorted( enumerate(all_similarities), key=lambda (i,v): -v)
-  print("Top Similarities ", map(lambda (i,v): "%s %.1f%%" % (code2word[i],v*100.), sorted_similarities[0:10]) )
+  for token_target in ["give", "wait", "book", "turkey", "angeles", "he", "further", "do", "monday", ]:
+    token_i = word2code.get(token_target, None)
+    if token_i is None:
+      print("Found token '%s' NOT FOUND " % (token_target,))
+      continue
+      
+    print("Found token '%s' at %d" % (token_target, token_i))
+    
+    token_v = e[token_i]
+    #print("self-cosine similarity %f" % (np.dot(token_v,token_v)))
+    
+    all_similarities = np.dot(e, token_v)
+    #print("overall similarity shape: ", all_similarities.shape)  # a 1-d array
+    
+    sorted_similarities = sorted( enumerate(all_similarities), key=lambda (i,v): -v)
+    print("Top Similarities for %20s :" % (token_target,), 
+      map(lambda (i,v): "%s %.1f%%" % (code2word[i],v*100.), sorted_similarities[0:10]) 
+    )
   
   exit(0)
 
