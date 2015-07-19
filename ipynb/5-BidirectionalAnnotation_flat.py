@@ -295,8 +295,21 @@ labels_raw = gather.apply(rnn_outputs_reshaped)  # This is pre-softmaxing
 print("labels_raw shape", labels_raw.shape.tag.test_value)              # array([ 464, 5]))
 
 
-def examine_embedding(e):
+def examine_embedding(embedding):
+  e = embedding.copy()
   print("Examine Embedding Shape : ", e.shape)
+  norms = np.apply_along_axis(np.linalg.norm, 1, e)  # normalize all vectors in the embedding
+  #e /= 
+  print("Examine Embedding norms Shape : ", norms[:,0].shape)
+  
+  token_target = "london"
+  token_i = word2code.get(token_target, None)
+  print("Found token '%s' at %d" % (token_target, token_i))
+  
+  token_v = e[token_i]
+  
+  print("self-cosine similarity %f" % (np.dot(token_v,token_v)))
+  
   exit(0)
 
 if not run_test:  # i.e. do training phase
