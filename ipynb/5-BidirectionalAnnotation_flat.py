@@ -303,7 +303,7 @@ def examine_embedding(embedding):
   #print("Examine Embedding norms Shape : ", norms.shape)
   e = e / norms
   
-  for token_target in ["give", "wait", "book", "turkey", "angeles", "he", "further", "do", "monday", ]:
+  for token_target in ["give", "wait", "book", "turkey", "angeles", "he", "further", "do", "monday", "NUMBER", ]:
     token_i = word2code.get(token_target, None)
     if token_i is None:
       print("Found token '%s' NOT FOUND " % (token_target,))
@@ -318,7 +318,9 @@ def examine_embedding(embedding):
     
     sorted_similarities = sorted( enumerate(all_similarities), key=lambda (i,v): -v)
     print("Top Similarities for %10s @ %4d:" % (token_target,token_i, ), 
-      map(lambda (i,v): "%s %.1f%%" % (code2word[i],v*100.), sorted_similarities[1:4])  # Element [0] is token itself
+      map(lambda (i,v): "%s %.1f%%" % (code2word[i],v*100.), 
+        sorted_similarities[1:4] # Element [0] is token itself
+      )  
     )
   
   #exit(0)
