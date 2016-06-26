@@ -1,6 +1,9 @@
 # Machine Learning : Going Deeper with Python and Theano
 
-This repo contains the materials for my presentation to PyCon (SG), on 19 June 2015.
+This repo contains the materials for my presentation to PyCon (SG), on 19 June **2015**.
+
+If you are interested in the wonderful Virtual Machine goodness of my 2016 PyCon presentation,
+the repo you should be looking at is [this one](https://github.com/mdda/deep-learning-workshop).
 
 ## Installation of requirements
 
